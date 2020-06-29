@@ -1,0 +1,24 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * craft-google-places plugin for Craft CMS 3.x
+ *
+ * CraftGooglePlacesField Field Input
+ *
+ * @author    Ben Norman
+ * @copyright Copyright (c) 2020 Ben Norman
+ * @link      https://www.headjam.com.au
+ * @package   CraftGooglePlaces
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{{ forms.textField({
+        label: 'Some Field',
+        instructions: 'Enter some text here.',
+        id: name,
+        name: name,
+        value: value})
+}}

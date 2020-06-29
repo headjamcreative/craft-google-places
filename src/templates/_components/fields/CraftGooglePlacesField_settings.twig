@@ -1,0 +1,26 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * craft-google-places plugin for Craft CMS
+ *
+ * CraftGooglePlacesField Field Settings
+ *
+ * @author    Ben Norman
+ * @copyright Copyright (c) 2020 Ben Norman
+ * @link      https://www.headjam.com.au
+ * @package   CraftGooglePlaces
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("headjam\\craftgoogleplaces\\assetbundles\\craftgoogleplaces\\CraftGooglePlacesAsset") %}
+
+{{ forms.textField({
+    label: 'Some Attribute',
+    instructions: 'Enter some attribute here.',
+    id: 'someAttribute',
+    name: 'someAttribute',
+    value: field['someAttribute']})
+}}

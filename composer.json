@@ -1,0 +1,41 @@
+{
+    "name": "headjam/craft-google-places",
+    "description": "Sycns Google Places API data to entries.",
+    "type": "craft-plugin",
+    "version": "1.0.0",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "craft-google-places"
+    ],
+    "support": {
+        "docs": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/blob/master/README.md",
+        "issues": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/issues"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ben Norman",
+            "homepage": "https://www.headjam.com.au"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+          "headjam\\craftgoogleplaces\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "craft-google-places",
+        "handle": "craft-google-places",
+        "developer": "Ben Norman",
+        "developerUrl": "https://www.headjam.com.au",
+        "documentationUrl": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/master/CHANGELOG.md",
+        "class": "headjam\\craftgoogleplaces\\CraftGooglePlaces"
+    }
+}
