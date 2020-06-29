@@ -1,6 +1,6 @@
 # craft-google-places plugin for Craft CMS 3.x
 
-Sycns Google Places API data to entries.
+Syncs Google Places API data to entries.
 
 ## Requirements
 

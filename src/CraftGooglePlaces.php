@@ -1,9 +1,7 @@
 <?php
 /**
- * craft-google-places plugin for Craft CMS 3.x
- *
- * Sycns Google Places API data to entries.
- *
+ * Craft Google Places plugin for Craft CMS 3.x
+ * Syncs Google Places API data to entries.
  * @link      https://www.headjam.com.au
  * @copyright Copyright (c) 2020 Ben Norman
  */

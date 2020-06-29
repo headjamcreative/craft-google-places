@@ -1,6 +1,6 @@
 {
     "name": "headjam/craft-google-places",
-    "description": "Sycns Google Places API data to entries.",
+    "description": "Syncs Google Places API data to entries.",
     "type": "craft-plugin",
     "version": "1.0.0",
     "keywords": [
