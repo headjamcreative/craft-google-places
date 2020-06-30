@@ -31,10 +31,26 @@ class CraftGooglePlacesSync extends Component
   // Private Properties
   // =========================================================================
   private $apiDetailsMap = [
-    'formatted_address' => 'address',
-    'formatted_phone_number' => 'phone',
-    'website' => 'website',
-    'url' => 'googleUrl'
+    'formatted_address' => [
+      'key' => 'address',
+      'format' => 'simple'
+    ],
+    'formatted_phone_number' => [
+      'key' => 'phone',
+      'format' => 'simple'
+    ],
+    'website' => [
+      'key' => 'website',
+      'format' => 'simple'
+    ],
+    'url' => [
+      'key' => 'googleUrl',
+      'format' => 'simple'
+    ],
+    'opening_hours' => [
+      'key' => 'hours',
+      'format' => 'hoursFormat',
+    ]
   ];
 
 
@@ -63,12 +79,21 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
-  private function getHourRow(string $hourRow) {
+  private function getHourRow(string $hourRow)
+  {
     $dayTime = explode(': ', $hourRow);
     return [
-      'col1' => $dayTime[0],
-      'col2' => $dayTime[1]
+      'label' => $dayTime[0],
+      'hours' => $dayTime[1]
     ];
+  }
+
+  private function hoursFormat(array $hoursObj)
+  {
+    if (array_key_exists('weekday_text', $hoursObj) && gettype($hoursObj['weekday_text'] == 'array')) {
+      return array_map(array($this, 'getHourRow'), $hoursObj['weekday_text']);
+    }
+    return [];
   }
 
   /** 
@@ -91,7 +116,12 @@ class CraftGooglePlacesSync extends Component
             return array_key_exists($key, $this->apiDetailsMap);
           }, ARRAY_FILTER_USE_KEY);
           foreach ($data as $key => $val) {
-            $value[$this->apiDetailsMap[$key]] = $val;
+            $format = $this->apiDetailsMap[$key]['format'];
+            if ($format == 'simple') {
+              $value[$this->apiDetailsMap[$key]['key']] = $val;
+            } else {
+              $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
+            }
           }
           $element->setFieldValue($field->handle, $value);
         }

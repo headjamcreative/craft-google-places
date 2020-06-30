@@ -68,6 +68,16 @@
           })
         }}
 
+        {{ 
+          forms.textField({
+            label: 'Google Url',
+            instructions: 'The Google url for maps and reviews.',
+            id: name ~ '_googleUrl',
+            name: name ~ '[googleUrl]',
+            value: value.googleUrl ?? ''
+          })
+        }}
+
         {{
           forms.editableTable({
             label: 'Hours',
@@ -89,7 +99,7 @@
                 type: 'singleline'
               }
             },
-            rows: (value.hours ?? [])|map(hour => {label: hour.label, hour: hour.hours}),
+            rows: (value.hours ?? [])|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
             maxRows: '7',
             minRows: '7'
           })
