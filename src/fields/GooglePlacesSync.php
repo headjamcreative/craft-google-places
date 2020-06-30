@@ -34,18 +34,22 @@ use craft\helpers\Json;
  */
 class GooglePlacesSync extends Field
 {
-  
   /**
    * Performs actions after the element has been saved.
    *
    * @param ElementInterface $element The element that was just saved
    * @param bool $isNew Whether the element is brand new
+   * @return bool True if the element should continue to save.
    */
-  public function afterElementSave(ElementInterface $element, bool $isNew)
+  public function beforeElementSave(ElementInterface $element, bool $isNew): bool
   {
-    if ($element->isFieldDirty('test') && !$element->getIsRevision()) {
-      CraftGooglePlaces::log('did it work!?');
+    if (
+      !$element->getIsRevision() &&
+      $element->isFieldDirty($this->handle)
+    ) {
+      return CraftGooglePlaces::getInstance()->googlePlacesSync->sync($element, $this);
     }
+    return true;
   }
 
   // Static Methods
@@ -133,7 +137,6 @@ class GooglePlacesSync extends Field
       'prefix' => Craft::$app->getView()->namespaceInputId(''),
     ];
     $jsonVars = Json::encode($jsonVars);
-    Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').CraftGooglePlacesGooglePlacesSync(" . $jsonVars . ");");
 
     // Render the input template
     return Craft::$app->getView()->renderTemplate(

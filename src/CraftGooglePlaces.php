@@ -10,6 +10,7 @@
 namespace headjam\craftgoogleplaces;
 
 use headjam\craftgoogleplaces\services\CraftGooglePlacesApi as CraftGooglePlacesApiService;
+use headjam\craftgoogleplaces\services\CraftGooglePlacesSync as CraftGooglePlacesSyncService;
 use headjam\craftgoogleplaces\models\Settings;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 
@@ -96,7 +97,8 @@ class CraftGooglePlaces extends Plugin
     parent::init();
     self::$plugin = $this;
     $this->setComponents([
-      'googlePlacesApiService' => CraftGooglePlacesApiService::class
+      'googlePlacesApi' => CraftGooglePlacesApiService::class,
+      'googlePlacesSync' => CraftGooglePlacesSyncService::class
     ]);
 
     // Init the customer logger
@@ -106,41 +108,12 @@ class CraftGooglePlaces extends Plugin
     ]);
     Craft::getLogger()->dispatcher->targets[] = $fileTarget;
 
-    // Register our site routes
-    Event::on(
-      UrlManager::class,
-      UrlManager::EVENT_REGISTER_SITE_URL_RULES,
-      function (RegisterUrlRulesEvent $event) {
-        $event->rules['siteActionTrigger1'] = 'craft-google-places/default';
-      }
-    );
-
-    // Register our CP routes
-    Event::on(
-      UrlManager::class,
-      UrlManager::EVENT_REGISTER_CP_URL_RULES,
-      function (RegisterUrlRulesEvent $event) {
-        $event->rules['cpActionTrigger1'] = 'craft-google-places/default/do-something';
-      }
-    );
-
     // Register our fields
     Event::on(
       Fields::class,
       Fields::EVENT_REGISTER_FIELD_TYPES,
       function (RegisterComponentTypesEvent $event) {
         $event->types[] = GooglePlacesSyncField::class;
-      }
-    );
-
-    // Do something after we're installed
-    Event::on(
-      Plugins::class,
-      Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-      function (PluginEvent $event) {
-        if ($event->plugin === $this) {
-          // We were just installed
-        }
       }
     );
   }
@@ -167,12 +140,6 @@ class CraftGooglePlaces extends Plugin
    */
   protected function settingsHtml(): string
   {
-    $lookup = CraftGooglePlaces::getInstance()->googlePlacesApiService->placeSearch('+61249291154');
-    CraftGooglePlaces::log(json_encode($lookup));
-    if ($lookup['success'] && $lookup['data']['candidates'][0]) {
-      $details = CraftGooglePlaces::getInstance()->googlePlacesApiService->placeDetails($lookup['data']['candidates'][0]['place_id']);
-      CraftGooglePlaces::log(json_encode($details));
-    }
     return Craft::$app->view->renderTemplate(
       'craft-google-places/settings',
       [

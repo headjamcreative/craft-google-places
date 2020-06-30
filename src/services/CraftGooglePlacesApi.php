@@ -34,7 +34,7 @@ class CraftGooglePlacesApi extends Component
    * Lookup a business in Google Places via either a phone number, business name, or address.
    * @return array An array containing a status and either error or data properties.
    */
-  public function placeSearch($input)
+  public function placeSearch(string $input)
   {
     $type = $input[0] == '+' && strlen($input) >= 11 ? 'phonenumber' : 'textquery';
     $params = '&inputtype=' . $type . '&input=' . urlencode($input);
@@ -46,7 +46,7 @@ class CraftGooglePlacesApi extends Component
    * @param string $placeId - The Google place_id to query by.
    * @return array An array containing a status and either error or data properties.
    */
-  public function placeDetails($placeId)
+  public function placeDetails(string $placeId)
   {
     return $this->googleApiRequest('place/details', '&place_id=' . urlencode($placeId));
   }
@@ -61,19 +61,17 @@ class CraftGooglePlacesApi extends Component
    * @param string $params - The query string items to append to the request.
    * @return array An array containing a status and either error or data properties.
    */
-  private function googleApiRequest($endpoint, $params)
+  private function googleApiRequest(string $endpoint, string $params)
   {
     try {
       $key = CraftGooglePlaces::getInstance()->getSettings()->googleApiKey;
       if (isset($key) && $key !== '') {
         $client = new \GuzzleHttp\Client();
         $url = 'https://maps.googleapis.com/maps/api/' . $endpoint . '/json?key=' . $key . $params;
-        CraftGooglePlaces::log($url);
         $response = $client->request('GET', $url);
         if ($response->getStatusCode() === 200) {
           $body = $response->getBody()->getContents();
           $data = \GuzzleHttp\json_decode($body, true);
-          CraftGooglePlaces::log($data);
           return [
             'success' => true,
             'data' => $data

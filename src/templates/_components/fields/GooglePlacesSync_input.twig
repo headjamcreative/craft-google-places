@@ -37,6 +37,45 @@
             value: value.id ?? ''
           })
         }}
+
+        {{ 
+          forms.textField({
+            label: 'Address',
+            instructions: 'The physical address of the business, with commas creating new lines when rendered.',
+            id: name ~ '_address',
+            name: name ~ '[address]',
+            value: value.address ?? ''
+          })
+        }}
+
+        {{ 
+          forms.textField({
+            label: 'Phone',
+            instructions: 'The phone number of the business.',
+            id: name ~ '_phone',
+            name: name ~ '[phone]',
+            value: value.phone ?? ''
+          })
+        }}
+
+        {{ 
+          forms.textField({
+            label: 'Website',
+            instructions: 'The website of the business.',
+            id: name ~ '_website',
+            name: name ~ '[website]',
+            value: value.website ?? ''
+          })
+        }}
+
+        {# {{
+          forms.editableTable({
+            label: 'Hours',
+            id: name ~ '_hours',
+            name: name ~ '[hours]',
+            value: value.hours ?? ''
+          })
+        }} #}
       </div>
     </div>
   </div>
