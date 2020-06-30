@@ -28,6 +28,19 @@ use craft\base\Field;
  */
 class CraftGooglePlacesSync extends Component
 {
+  // Private Properties
+  // =========================================================================
+  private $apiDetailsMap = [
+    'formatted_address' => 'address',
+    'formatted_phone_number' => 'phone',
+    'website' => 'website',
+    'url' => 'googleUrl'
+  ];
+
+
+
+  // Public Methods
+  // =========================================================================
   /** 
    * Determine if a sync is possible, and send it to the id lookup or details query as needed
    * @param ElementInterface $element - The element that was just saved.
@@ -50,6 +63,14 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
+  private function getHourRow(string $hourRow) {
+    $dayTime = explode(': ', $hourRow);
+    return [
+      'col1' => $dayTime[0],
+      'col2' => $dayTime[1]
+    ];
+  }
+
   /** 
    * Query the details for a given GooglePlace and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
@@ -66,10 +87,12 @@ class CraftGooglePlacesSync extends Component
       if (isset($id) && $id !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
         if ($result['success'] && $result['data'] && $result['data']['result']) {
-          $data = $result['data']['result'];
-          $value['address'] = $data['formatted_address'];
-          $value['phone'] = $data['formatted_phone_number'];
-          $value['website'] = $data['website'];
+          $data = array_filter($result['data']['result'], function($key) {
+            return array_key_exists($key, $this->apiDetailsMap);
+          }, ARRAY_FILTER_USE_KEY);
+          foreach ($data as $key => $val) {
+            $value[$this->apiDetailsMap[$key]] = $val;
+          }
           $element->setFieldValue($field->handle, $value);
         }
       }

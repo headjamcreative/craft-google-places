@@ -68,14 +68,32 @@
           })
         }}
 
-        {# {{
+        {{
           forms.editableTable({
             label: 'Hours',
             id: name ~ '_hours',
             name: name ~ '[hours]',
-            value: value.hours ?? ''
+            value: value.hours ?? '',
+            columnType: 'text',
+            cols: {
+              label: {
+                heading: 'Label',
+                handle: 'label',
+                width: '',
+                type: 'singleline'
+              },
+              hours: {
+                heading: 'Hours',
+                handle: 'hours',
+                width: '',
+                type: 'singleline'
+              }
+            },
+            rows: (value.hours ?? [])|map(hour => {label: hour.label, hour: hour.hours}),
+            maxRows: '7',
+            minRows: '7'
           })
-        }} #}
+        }}
       </div>
     </div>
   </div>
