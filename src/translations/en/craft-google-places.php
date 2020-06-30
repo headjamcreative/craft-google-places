@@ -1,6 +1,6 @@
 <?php
 /**
- * craft-google-places plugin for Craft CMS 3.x
+ * Craft Google Places plugin for Craft CMS 3.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -9,7 +9,7 @@
  */
 
 /**
- * craft-google-places en Translation
+ * Craft Google Places en Translation
  *
  * Returns an array with the string to be translated (as passed to `Craft::t('craft-google-places', '...')`) as
  * the key, and the translation as the value.
@@ -21,5 +21,5 @@
  * @since     1.0.0
  */
 return [
-    'craft-google-places plugin loaded' => 'craft-google-places plugin loaded',
+    'Craft Google Places plugin loaded' => 'Craft Google Places plugin loaded',
 ];

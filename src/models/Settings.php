@@ -1,6 +1,6 @@
 <?php
 /**
- * craft-google-places plugin for Craft CMS 3.x
+ * Craft Google Places plugin for Craft CMS 3.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -39,7 +39,7 @@ class Settings extends Model
      *
      * @var string
      */
-    public $someAttribute = 'Some Default';
+    public $googleApiKey = '';
 
     // Public Methods
     // =========================================================================
@@ -57,8 +57,9 @@ class Settings extends Model
     public function rules()
     {
         return [
-            ['someAttribute', 'string'],
-            ['someAttribute', 'default', 'value' => 'Some Default'],
+            ['googleApiKey', 'string'],
+            ['googleApiKey', 'required'],
+            ['googleApiKey', 'default', 'value' => ''],
         ];
     }
 }

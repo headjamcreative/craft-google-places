@@ -1,9 +1,7 @@
 <?php
 /**
- * craft-google-places plugin for Craft CMS 3.x
- *
+ * Craft Google Places plugin for Craft CMS 3.x
  * Syncs Google Places API data to entries.
- *
  * @link      https://www.headjam.com.au
  * @copyright Copyright (c) 2020 Ben Norman
  */
@@ -11,7 +9,6 @@
 namespace headjam\craftgoogleplaces\fields;
 
 use headjam\craftgoogleplaces\CraftGooglePlaces;
-use headjam\craftgoogleplaces\assetbundles\craftgoogleplacesfieldfield\CraftGooglePlacesFieldFieldAsset;
 
 use Craft;
 use craft\base\ElementInterface;
@@ -21,7 +18,7 @@ use yii\db\Schema;
 use craft\helpers\Json;
 
 /**
- * CraftGooglePlacesField Field
+ * GooglePlacesId Field
  *
  * Whenever someone creates a new field in Craft, they must specify what
  * type of field it is. The system comes with a handful of field types baked in,
@@ -33,7 +30,7 @@ use craft\helpers\Json;
  * @package   CraftGooglePlaces
  * @since     1.0.0
  */
-class CraftGooglePlacesField extends Field
+class GooglePlacesId extends Field
 {
     // Public Properties
     // =========================================================================
@@ -55,7 +52,7 @@ class CraftGooglePlacesField extends Field
      */
     public static function displayName(): string
     {
-        return Craft::t('craft-google-places', 'CraftGooglePlacesField');
+        return Craft::t('craft-google-places', 'Google Places ID');
     }
 
     // Public Methods
@@ -226,7 +223,7 @@ class CraftGooglePlacesField extends Field
     {
         // Render the settings template
         return Craft::$app->getView()->renderTemplate(
-            'craft-google-places/_components/fields/CraftGooglePlacesField_settings',
+            'craft-google-places/_components/fields/GooglePlacesId_settings',
             [
                 'field' => $this,
             ]
@@ -332,9 +329,6 @@ class CraftGooglePlacesField extends Field
      */
     public function getInputHtml($value, ElementInterface $element = null): string
     {
-        // Register our asset bundle
-        Craft::$app->getView()->registerAssetBundle(CraftGooglePlacesFieldFieldAsset::class);
-
         // Get our id and namespace
         $id = Craft::$app->getView()->formatInputId($this->handle);
         $namespacedId = Craft::$app->getView()->namespaceInputId($id);
@@ -347,11 +341,11 @@ class CraftGooglePlacesField extends Field
             'prefix' => Craft::$app->getView()->namespaceInputId(''),
             ];
         $jsonVars = Json::encode($jsonVars);
-        Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').CraftGooglePlacesCraftGooglePlacesField(" . $jsonVars . ");");
+        Craft::$app->getView()->registerJs("$('#{$namespacedId}-field').CraftGooglePlacesGooglePlacesId(" . $jsonVars . ");");
 
         // Render the input template
         return Craft::$app->getView()->renderTemplate(
-            'craft-google-places/_components/fields/CraftGooglePlacesField_input',
+            'craft-google-places/_components/fields/GooglePlacesId_input',
             [
                 'name' => $this->handle,
                 'value' => $value,

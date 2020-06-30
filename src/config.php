@@ -1,6 +1,6 @@
 <?php
 /**
- * craft-google-places plugin for Craft CMS 3.x
+ * Craft Google Places plugin for Craft CMS 3.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -9,9 +9,9 @@
  */
 
 /**
- * craft-google-places config.php
+ * Craft Google Places config.php
  *
- * This file exists only as a template for the craft-google-places settings.
+ * This file exists only as a template for the Craft Google Places settings.
  * It does nothing on its own.
  *
  * Don't edit this file, instead copy it to 'craft/config' as 'craft-google-places.php'
