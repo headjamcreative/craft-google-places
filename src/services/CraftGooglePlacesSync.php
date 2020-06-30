@@ -50,6 +50,10 @@ class CraftGooglePlacesSync extends Component
     'opening_hours' => [
       'key' => 'hours',
       'format' => 'hoursFormat',
+    ],
+    'geometry' => [
+      'key' => 'coordinates',
+      'format' => 'coordsFormat'
     ]
   ];
 
@@ -79,21 +83,35 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
-  private function getHourRow(string $hourRow)
+  /** 
+   * Formats the value for the hours array.
+   * @param array $hours - The opening hours as returned by the Google Places api.
+   * @param array The Craft-ready array.
+   */
+  private function hoursFormat(array $hours)
   {
-    $dayTime = explode(': ', $hourRow);
-    return [
-      'label' => $dayTime[0],
-      'hours' => $dayTime[1]
-    ];
-  }
-
-  private function hoursFormat(array $hoursObj)
-  {
-    if (array_key_exists('weekday_text', $hoursObj) && gettype($hoursObj['weekday_text'] == 'array')) {
-      return array_map(array($this, 'getHourRow'), $hoursObj['weekday_text']);
+    if (array_key_exists('weekday_text', $hours) && gettype($hours['weekday_text'] == 'array')) {
+      return array_map(function(string $hourRow) {
+        $dayTime = explode(': ', $hourRow);
+        return [
+          'label' => $dayTime[0],
+          'hours' => $dayTime[1]
+        ];
+      }, $hours['weekday_text']);
     }
     return [];
+  }
+
+  /**
+   * Formats the value for the location coordinates.
+   * @param array $coords - The geometry as returned by the Google Places api.
+   * @param array The Craft-ready array.
+   */
+  private function coordsFormat(array $coords) {
+   if (isset($coords['location']) && isset($coords['location']['lat']) && isset($coords['location']['lng'])) {
+    return $coords['location']['lat'] . ',' . $coords['location']['lng'];
+   } 
+   return '';
   }
 
   /** 

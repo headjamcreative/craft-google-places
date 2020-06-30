@@ -22,7 +22,7 @@
           forms.textField({
             label: 'Google Places Lookup',
             instructions: 'The lookup to query Google Places for an ID. Can be a business name, address, or international-formatted phone number.',
-            id: name ~ '_lookup',
+            id: 'lookup',
             name: name ~ '[lookup]',
             value: value.lookup ?? ''
           })
@@ -32,7 +32,7 @@
           forms.textField({
             label: 'Google Places ID',
             instructions: 'The ID to query Google Places for data. If blank, the system will try to retrieve an ID based on the Google Lookup value above.',
-            id: name ~ '_id',
+            id: 'id',
             name: name ~ '[id]',
             value: value.id ?? ''
           })
@@ -42,7 +42,7 @@
           forms.textField({
             label: 'Address',
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
-            id: name ~ '_address',
+            id: 'address',
             name: name ~ '[address]',
             value: value.address ?? ''
           })
@@ -52,7 +52,7 @@
           forms.textField({
             label: 'Phone',
             instructions: 'The phone number of the business.',
-            id: name ~ '_phone',
+            id: 'phone',
             name: name ~ '[phone]',
             value: value.phone ?? ''
           })
@@ -62,7 +62,7 @@
           forms.textField({
             label: 'Website',
             instructions: 'The website of the business.',
-            id: name ~ '_website',
+            id: 'website',
             name: name ~ '[website]',
             value: value.website ?? ''
           })
@@ -72,16 +72,26 @@
           forms.textField({
             label: 'Google Url',
             instructions: 'The Google url for maps and reviews.',
-            id: name ~ '_googleUrl',
+            id: 'googleUrl',
             name: name ~ '[googleUrl]',
             value: value.googleUrl ?? ''
+          })
+        }}
+
+        {{ 
+          forms.textField({
+            label: 'Coordinates',
+            instructions: 'If alternate coordinates are supplied below, this will be ignored..',
+            id: 'coordinates',
+            name: name ~ '[coordinates]',
+            value: value.coordinates ?? ''
           })
         }}
 
         {{
           forms.editableTable({
             label: 'Hours',
-            id: name ~ '_hours',
+            id: 'hours',
             name: name ~ '[hours]',
             value: value.hours ?? '',
             columnType: 'text',
