@@ -2,24 +2,25 @@
 /**
  * Craft Google Places plugin for Craft CMS 3.x
  * Syncs Google Places API data to entries.
+ *
  * @link      https://www.headjam.com.au
  * @copyright Copyright (c) 2020 Ben Norman
  */
 
-//  TODO: restrict api key
-
 namespace headjam\craftgoogleplaces;
 
+use headjam\craftgoogleplaces\services\CraftGooglePlacesService as CraftGooglePlacesServiceService;
 use headjam\craftgoogleplaces\models\Settings;
-use headjam\craftgoogleplaces\fields\GooglePlacesId as GooglePlacesIdField;
-use SKAgarwal\GoogleApi\PlacesApi;
+use headjam\craftgoogleplaces\fields\CraftGooglePlacesId as CraftGooglePlacesIdField;
 
 use Craft;
 use craft\base\Plugin;
 use craft\services\Plugins;
 use craft\events\PluginEvent;
+use craft\web\UrlManager;
 use craft\services\Fields;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterUrlRulesEvent;
 
 use yii\base\Event;
 
@@ -29,6 +30,7 @@ use yii\base\Event;
  * @package   CraftGooglePlaces
  * @since     1.0.0
  *
+ * @property  CraftGooglePlacesServiceService $craftGooglePlacesService
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
@@ -39,28 +41,30 @@ class CraftGooglePlaces extends Plugin
   /**
    * Static property that is an instance of this plugin class so that it can be accessed via
    * CraftGooglePlaces::$plugin
+   *
    * @var CraftGooglePlaces
    */
   public static $plugin;
-
-
 
   // Public Properties
   // =========================================================================
   /**
    * To execute your plugin’s migrations, you’ll need to increase its schema version.
+   *
    * @var string
    */
   public $schemaVersion = '1.0.0';
 
   /**
    * Set to `true` if the plugin should have a settings view in the control panel.
+   *
    * @var bool
    */
   public $hasCpSettings = true;
 
   /**
    * Set to `true` if the plugin should have its own section (main nav item) in the control panel.
+   *
    * @var bool
    */
   public $hasCpSection = false;
@@ -99,14 +103,30 @@ class CraftGooglePlaces extends Plugin
       'except' => ['application']
     ]);
 
-    Craft::getLogger()->dispatcher->targets[] = $fileTarget;
+    // Register our site routes
+    Event::on(
+      UrlManager::class,
+      UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+      function (RegisterUrlRulesEvent $event) {
+        $event->rules['siteActionTrigger1'] = 'craft-google-places/default';
+      }
+    );
+
+    // Register our CP routes
+    Event::on(
+      UrlManager::class,
+      UrlManager::EVENT_REGISTER_CP_URL_RULES,
+      function (RegisterUrlRulesEvent $event) {
+        $event->rules['cpActionTrigger1'] = 'craft-google-places/default/do-something';
+      }
+    );
 
     // Register our fields
     Event::on(
       Fields::class,
       Fields::EVENT_REGISTER_FIELD_TYPES,
       function (RegisterComponentTypesEvent $event) {
-        $event->types[] = GooglePlacesIdField::class;
+        $event->types[] = CraftGooglePlacesIdField::class;
       }
     );
 
@@ -122,10 +142,13 @@ class CraftGooglePlaces extends Plugin
     );
   }
 
+
+
   // Protected Methods
   // =========================================================================
   /**
    * Creates and returns the model used to store the plugin’s settings.
+   *
    * @return \craft\base\Model|null
    */
   protected function createSettingsModel()
@@ -136,13 +159,11 @@ class CraftGooglePlaces extends Plugin
   /**
    * Returns the rendered settings HTML, which will be inserted into the content
    * block on the settings page.
+   *
    * @return string The rendered settings HTML
    */
   protected function settingsHtml(): string
   {
-    $googlePlaces = new PlacesApi($this->getSettings()->googleApiKey);
-    $response = $googlePlaces->placeDetails('ChIJzbSYIjzScmsRjg0MwAJbWFk');
-    CraftGooglePlaces::log(json_encode($response));
     return Craft::$app->view->renderTemplate(
       'craft-google-places/settings',
       [

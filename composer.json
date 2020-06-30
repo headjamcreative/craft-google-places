@@ -8,11 +8,11 @@
         "cms",
         "craftcms",
         "craft-plugin",
-        "craft-google-places"
+        "craft google places"
     ],
     "support": {
-        "docs": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/blob/master/README.md",
-        "issues": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/issues"
+        "docs": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
+        "issues": "https://github.com/headjamcreative/craft-google-places/issues"
     },
     "license": "MIT",
     "authors": [
@@ -34,8 +34,11 @@
         "handle": "craft-google-places",
         "developer": "Ben Norman",
         "developerUrl": "https://www.headjam.com.au",
-        "documentationUrl": "https://github.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/blob/master/README.md",
-        "changelogUrl": "https://raw.githubusercontent.com/https://github.com/headjamcreative/craft-google-places/craft-google-places/master/CHANGELOG.md",
+        "documentationUrl": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
+        "changelogUrl": "https://raw.githubusercontent.com/headjamcreative/craft-google-places/master/CHANGELOG.md",
+        "components": {
+            "craftGooglePlacesService": "headjam\\craftgoogleplaces\\services\\CraftGooglePlacesService"
+        },
         "class": "headjam\\craftgoogleplaces\\CraftGooglePlaces"
     }
 }

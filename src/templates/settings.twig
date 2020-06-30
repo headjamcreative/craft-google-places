@@ -1,8 +1,6 @@
-{# @var craft \craft\web\twig\variables\CraftVariable #}
 {#
 /**
  * Craft Google Places plugin for Craft CMS 3.x
- *
  * Craft Google Places Settings.twig
  *
  * @author    Ben Norman
@@ -13,13 +11,13 @@
  */
 #}
 
-{% import "_includes/forms" as forms %}
+{% import '_includes/forms' as forms %}
 
 {{ forms.textField({
-    label: 'Google Cloud Console API Key',
-    instructions: 'See: https://developers.google.com/places/web-service/get-api-key',
-    id: 'googleApiKey',
-    name: 'googleApiKey',
-    required: true,
-    value: settings['googleApiKey']})
+  label: 'Google Cloud Console API Key',
+  instructions: 'See: https://developers.google.com/places/web-service/get-api-key',
+  id: 'googleApiKey',
+  name: 'googleApiKey',
+  required: true,
+  value: settings['googleApiKey']})
 }}
