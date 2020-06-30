@@ -1,0 +1,43 @@
+{# @var craft \craft\web\twig\variables\CraftVariable #}
+{#
+/**
+ * Craft Google Places plugin for Craft CMS 3.x
+ *
+ * GooglePlacesSync Field Input
+ *
+ * @author    Ben Norman
+ * @copyright Copyright (c) 2020 Ben Norman
+ * @link      https://www.headjam.com.au
+ * @package   CraftGooglePlaces
+ * @since     1.0.0
+ */
+#}
+
+{% import "_includes/forms" as forms %}
+<div class="matrix matrix-field">
+  <div class="blocks">
+    <div class="matrixblock">
+      <div class="fields">
+        {{ 
+          forms.textField({
+            label: 'Google Places Lookup',
+            instructions: 'The lookup to query Google Places for an ID. Can be a business name, address, or international-formatted phone number.',
+            id: name ~ '_lookup',
+            name: name ~ '[lookup]',
+            value: value.lookup ?? ''
+          })
+        }}
+
+        {{ 
+          forms.textField({
+            label: 'Google Places ID',
+            instructions: 'The ID to query Google Places for data. If blank, the system will try to retrieve an ID based on the Google Lookup value above.',
+            id: name ~ '_id',
+            name: name ~ '[id]',
+            value: value.id ?? ''
+          })
+        }}
+      </div>
+    </div>
+  </div>
+</div>

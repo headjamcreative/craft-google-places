@@ -37,7 +37,7 @@
         "documentationUrl": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
         "changelogUrl": "https://raw.githubusercontent.com/headjamcreative/craft-google-places/master/CHANGELOG.md",
         "components": {
-            "craftGooglePlacesService": "headjam\\craftgoogleplaces\\services\\CraftGooglePlacesService"
+            "craftGooglePlacesService": "headjam\\craftgoogleplaces\\services\\CraftGooglePlacesApi"
         },
         "class": "headjam\\craftgoogleplaces\\CraftGooglePlaces"
     }

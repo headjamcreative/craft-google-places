@@ -9,9 +9,9 @@
 
 namespace headjam\craftgoogleplaces;
 
-use headjam\craftgoogleplaces\services\CraftGooglePlacesService as CraftGooglePlacesServiceService;
+use headjam\craftgoogleplaces\services\CraftGooglePlacesApi as CraftGooglePlacesApiService;
 use headjam\craftgoogleplaces\models\Settings;
-use headjam\craftgoogleplaces\fields\CraftGooglePlacesId as CraftGooglePlacesIdField;
+use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 
 use Craft;
 use craft\base\Plugin;
@@ -30,7 +30,7 @@ use yii\base\Event;
  * @package   CraftGooglePlaces
  * @since     1.0.0
  *
- * @property  CraftGooglePlacesServiceService $craftGooglePlacesService
+ * @property  CraftGooglePlacesApiService $craftGooglePlacesService
  * @property  Settings $settings
  * @method    Settings getSettings()
  */
@@ -95,13 +95,16 @@ class CraftGooglePlaces extends Plugin
   {
     parent::init();
     self::$plugin = $this;
+    $this->setComponents([
+      'googlePlacesApiService' => CraftGooglePlacesApiService::class
+    ]);
 
     // Init the customer logger
     $fileTarget = new \craft\log\FileTarget([
       'logFile' => Craft::getAlias('@storage/logs/craftGooglePlaces.log'),
-      'categories' => ['craft-google-places'],
-      'except' => ['application']
+      'categories' => ['craft-google-places']
     ]);
+    Craft::getLogger()->dispatcher->targets[] = $fileTarget;
 
     // Register our site routes
     Event::on(
@@ -126,7 +129,7 @@ class CraftGooglePlaces extends Plugin
       Fields::class,
       Fields::EVENT_REGISTER_FIELD_TYPES,
       function (RegisterComponentTypesEvent $event) {
-        $event->types[] = CraftGooglePlacesIdField::class;
+        $event->types[] = GooglePlacesSyncField::class;
       }
     );
 
@@ -164,6 +167,12 @@ class CraftGooglePlaces extends Plugin
    */
   protected function settingsHtml(): string
   {
+    $lookup = CraftGooglePlaces::getInstance()->googlePlacesApiService->placeSearch('+61249291154');
+    CraftGooglePlaces::log(json_encode($lookup));
+    if ($lookup['success'] && $lookup['data']['candidates'][0]) {
+      $details = CraftGooglePlaces::getInstance()->googlePlacesApiService->placeDetails($lookup['data']['candidates'][0]['place_id']);
+      CraftGooglePlaces::log(json_encode($details));
+    }
     return Craft::$app->view->renderTemplate(
       'craft-google-places/settings',
       [
