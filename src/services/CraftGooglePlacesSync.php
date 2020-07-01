@@ -74,11 +74,16 @@ class CraftGooglePlacesSync extends Component
   public function sync(ElementInterface $element, Field $field)
   {
     $value = $element->getFieldValue($field->handle);
+    CraftGooglePlaces::log('Test1');
+    CraftGooglePlaces::log($value);
     if (isset($value['id']) && $value['id'] !== '') {
+      CraftGooglePlaces::log('Test2');
       return $this->getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
+      CraftGooglePlaces::log('Test3');
       return $this->getPlaceId($value, $field, $element);
     } else {
+      CraftGooglePlaces::log('Test4');
       return true;
     }
   }

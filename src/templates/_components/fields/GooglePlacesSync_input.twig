@@ -13,6 +13,7 @@
  */
 #}
 
+{%- set dataSyncing = value.id ?? false or value.lookup ?? false -%}
 {% import "_includes/forms" as forms %}
 <div class="matrix matrix-field">
   <div class="blocks">
@@ -44,7 +45,7 @@
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
             id: 'address',
             name: name ~ '[address]',
-            readonly: true,
+            readonly: dataSyncing,
             value: value.address ?? ''
           })
         }}
@@ -55,6 +56,7 @@
             instructions: 'The phone number of the business.',
             id: 'phone',
             name: name ~ '[phone]',
+            readonly: dataSyncing,
             value: value.phone ?? ''
           })
         }}
@@ -65,6 +67,7 @@
             instructions: 'The website of the business.',
             id: 'website',
             name: name ~ '[website]',
+            readonly: dataSyncing,
             value: value.website ?? ''
           })
         }}
@@ -75,6 +78,7 @@
             instructions: 'The Google url for maps and reviews.',
             id: 'googleUrl',
             name: name ~ '[googleUrl]',
+            readonly: dataSyncing,
             value: value.googleUrl ?? ''
           })
         }}
@@ -85,6 +89,7 @@
             instructions: 'If alternate coordinates are supplied below, this will be ignored..',
             id: 'coordinates',
             name: name ~ '[coordinates]',
+            readonly: dataSyncing,
             value: value.coordinates ?? ''
           })
         }}
@@ -95,6 +100,7 @@
             instructions: 'The business open hours.',
             id: 'hours',
             name: name ~ '[hours]',
+            readonly: dataSyncing,
             cols: {
               label: {
                 heading: 'Label',
