@@ -47,7 +47,7 @@ class GooglePlacesSync extends Field
       !$element->getIsRevision() &&
       $element->isFieldDirty($this->handle)
     ) {
-      return CraftGooglePlaces::getInstance()->googlePlacesSync->sync($element, $this);
+      return CraftGooglePlaces::getInstance()->googlePlacesSync->sync($element, $this, true);
     }
     return true;
   }

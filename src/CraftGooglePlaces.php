@@ -98,7 +98,8 @@ class CraftGooglePlaces extends Plugin
     self::$plugin = $this;
     $this->setComponents([
       'googlePlacesApi' => CraftGooglePlacesApiService::class,
-      'googlePlacesSync' => CraftGooglePlacesSyncService::class
+      'googlePlacesSync' => CraftGooglePlacesSyncService::class,
+      'fields' => Fields::class
     ]);
 
     // Init the customer logger

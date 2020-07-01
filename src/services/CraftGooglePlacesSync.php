@@ -16,6 +16,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\base\Field;
+use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 
 /**
  * CraftGooglePlacesSync Service
@@ -74,24 +75,61 @@ class CraftGooglePlacesSync extends Component
   public function sync(ElementInterface $element, Field $field)
   {
     $value = $element->getFieldValue($field->handle);
-    CraftGooglePlaces::log('Test1');
-    CraftGooglePlaces::log($value);
+    $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
-      CraftGooglePlaces::log('Test2');
       return $this->getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      CraftGooglePlaces::log('Test3');
       return $this->getPlaceId($value, $field, $element);
     } else {
-      CraftGooglePlaces::log('Test4');
       return true;
     }
+  }
+
+  /** 
+   * Get all entries with the matching field type, update
+   * the updated value of the field to mark it as dirty, then
+   * save the element, triggering the onElementSave function.
+   */
+  public function syncAll()
+  {
+    $entries = $this->entriesWithField();
+    foreach($entries as $entry) {
+      $layout = $entry->getFieldLayout();
+      $fields = isset($layout) ? $layout->getFields() : [];
+      foreach ($fields as $field) {
+        if ($field instanceof GooglePlacesSyncField) {
+          $value = $entry->getFieldValue($field->handle);
+          // This marks the field as dirty, triggering the sync on save
+          $value['updated'] = time();
+          $entry->setFieldValue($field->handle, $value);
+          Craft::$app->elements->saveElement($entry);
+        }
+      }
+    }
+    return $entries['entries'];
   }
 
 
 
   // Private Methods
   // =========================================================================
+  /** 
+   * Return an array of all entries with the custom field type.
+   * @return Entry[]
+   */
+  private function entriesWithField() {
+    $allFields = CraftGooglePlaces::getInstance()->fields->getAllFields('global');
+    $searchQuery = '';
+    foreach($allFields as $field) {
+      if ($field instanceof GooglePlacesSyncField) {
+        $searchQuery = ' OR ' . $field->handle . ':*';
+      }
+    }
+    $searchQuery = preg_replace('/ OR /', '', $searchQuery, 1);
+    $entries = strlen($searchQuery) ? \craft\elements\Entry::find()->search($searchQuery)->unique()->all() : [];
+    return $entries;
+  }
+
   /** 
    * Formats the value for the hours array.
    * @param array $hours - The opening hours as returned by the Google Places api.
