@@ -44,6 +44,7 @@
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
             id: 'address',
             name: name ~ '[address]',
+            readonly: true,
             value: value.address ?? ''
           })
         }}
@@ -88,30 +89,37 @@
           })
         }}
 
-        {{
-          forms.editableTable({
+        {{ 
+          forms.editableTableField({
             label: 'Hours',
+            instructions: 'The business open hours.',
             id: 'hours',
             name: name ~ '[hours]',
-            value: value.hours ?? '',
-            columnType: 'text',
             cols: {
               label: {
                 heading: 'Label',
                 handle: 'label',
-                width: '',
                 type: 'singleline'
               },
               hours: {
                 heading: 'Hours',
                 handle: 'hours',
-                width: '',
                 type: 'singleline'
               }
             },
             rows: (value.hours ?? [])|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
             maxRows: '7',
             minRows: '7'
+          }) 
+        }}
+
+        {{ 
+          forms.lightswitchField({
+            label: 'Hide reviews?',
+            instructions: 'Optionally hide Google reviews for this directory item',
+            id: 'hideReviews',
+            name: name ~ '[hideReviews]',
+            on: value.hideReviews ?? false
           })
         }}
       </div>

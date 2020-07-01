@@ -54,6 +54,10 @@ class CraftGooglePlacesSync extends Component
     'geometry' => [
       'key' => 'coordinates',
       'format' => 'coordsFormat'
+    ],
+    'reviews' => [
+      'key' => 'reviews',
+      'format' => 'simple'
     ]
   ];
 
