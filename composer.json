@@ -30,7 +30,7 @@
         }
     },
     "extra": {
-        "name": "Craft Google Places",
+        "name": "Google Places Sync",
         "handle": "craft-google-places",
         "developer": "Ben Norman",
         "developerUrl": "https://www.headjam.com.au",

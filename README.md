@@ -1,4 +1,4 @@
-# Craft Google Places plugin for Craft CMS 3.x
+# Google Places Sync plugin for Craft CMS 3.x
 
 Syncs Google Places API data to entries.
 
@@ -18,13 +18,13 @@ To install the plugin, follow these instructions.
 
         composer require headjamcreative/craft-google-places
 
-3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Craft Google Places.
+3. In the Control Panel, go to Settings → Plugins and click the “Install” button for Google Places Sync.
 
-## Configuring Craft Google Places
+## Configuring Google Places Sync
 
 Ensure you add a Google Cloud Console api key in the app settings for this plugin to work. Be aware that this may come with additional cost from Google for the api queries. @see <https://developers.google.com/places/web-service/get-api-key>
 
-## Using Craft Google Places
+## Using Google Places Sync
 
 Add a 'Google Places Sync' field to your entry or global, then in the lookup filed add either a business name, address, or an international phone number (including country code, e.g. +61249291154). At present the plugin only retrieves the first available candidate. If this is not the correct candiate, you can manually lookup the place_id and override the id field. The lookup field is ignored if an id is already present.
 

@@ -1,4 +1,4 @@
-# Craft Google Places Changelog
+# Google Places Sync Changelog
 
 All notable changes to this project will be documented in this file.
 

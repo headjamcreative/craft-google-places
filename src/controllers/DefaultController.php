@@ -1,6 +1,6 @@
 <?php
 /**
- * Craft Google Places plugin for Craft CMS 3.x
+ * Google Places Syncs plugin for Craft CMS 3.x
  *
  * Syncs Google Places API data to entries.
  *
