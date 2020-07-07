@@ -41,6 +41,17 @@
 
         {{ 
           forms.textField({
+            label: 'Name',
+            instructions: 'The name of the business.',
+            id: 'name',
+            name: name ~ '[name]',
+            readonly: dataSyncing,
+            value: value.name ?? ''
+          })
+        }}
+
+        {{ 
+          forms.textField({
             label: 'Address',
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
             id: 'address',

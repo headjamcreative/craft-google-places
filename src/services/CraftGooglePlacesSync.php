@@ -32,6 +32,10 @@ class CraftGooglePlacesSync extends Component
   // Private Properties
   // =========================================================================
   private $apiDetailsMap = [
+    'name' => [
+      'key' => 'name',
+      'format' => 'simple'
+    ],
     'formatted_address' => [
       'key' => 'address',
       'format' => 'simple'
