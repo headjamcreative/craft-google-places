@@ -14,12 +14,13 @@
 #}
 
 {%- set dataSyncing = value.id ?? false or value.lookup ?? false -%}
+
 {% import "_includes/forms" as forms %}
 <div class="matrix matrix-field">
   <div class="blocks">
     <div class="matrixblock">
       <div class="fields">
-        {{ 
+        {{
           forms.textField({
             label: 'Google Places Lookup',
             instructions: 'The lookup to query Google Places for an ID. Can be a business name, address, or international-formatted phone number.',
@@ -29,7 +30,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Google Places ID',
             instructions: 'The ID to query Google Places for data. If blank, the system will try to retrieve an ID based on the Google Lookup value above.',
@@ -39,7 +40,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Name',
             instructions: 'The name of the business.',
@@ -50,7 +51,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Address',
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
@@ -61,7 +62,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Phone',
             instructions: 'The phone number of the business.',
@@ -72,7 +73,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Website',
             instructions: 'The website of the business.',
@@ -83,7 +84,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Google Url',
             instructions: 'The Google url for maps and reviews.',
@@ -94,7 +95,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.textField({
             label: 'Coordinates',
             instructions: 'If alternate coordinates are supplied below, this will be ignored..',
@@ -105,7 +106,7 @@
           })
         }}
 
-        {{ 
+        {{
           forms.editableTableField({
             label: 'Hours',
             instructions: 'The business open hours.',
@@ -122,14 +123,14 @@
                 handle: 'hours',
                 type: 'singleline'
               }
-            },
+            }|filter,
             rows: (value.hours ?? [])|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
             maxRows: '7',
             minRows: '7'
-          }) 
+          })
         }}
 
-        {{ 
+        {{
           forms.lightswitchField({
             label: 'Hide reviews?',
             instructions: 'Optionally hide Google reviews for this directory item',
