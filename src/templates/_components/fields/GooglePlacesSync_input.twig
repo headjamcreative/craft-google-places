@@ -106,6 +106,7 @@
           })
         }}
 
+        {% set hoursVal = (value.hours ?? false) is iterable ? value.hours : [] %}
         {{
           forms.editableTableField({
             label: 'Hours',
@@ -124,7 +125,7 @@
                 type: 'singleline'
               }
             }|filter,
-            rows: (value.hours ?? [])|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
+            rows: hoursVal|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
             maxRows: '7',
             minRows: '0'
           })
