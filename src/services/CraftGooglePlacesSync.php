@@ -96,21 +96,25 @@ class CraftGooglePlacesSync extends Component
    */
   public function syncAll()
   {
-    $entries = $this->entriesWithField();
-    foreach($entries as $entry) {
-      $layout = $entry->getFieldLayout();
-      $fields = isset($layout) ? $layout->getFields() : [];
-      foreach ($fields as $field) {
-        if ($field instanceof GooglePlacesSyncField) {
-          $value = $entry->getFieldValue($field->handle);
-          // This marks the field as dirty, triggering the sync on save
-          $value['updated'] = time();
-          $entry->setFieldValue($field->handle, $value);
-          Craft::$app->elements->saveElement($entry);
+    try {
+      $entries = $this->entriesWithField();
+      foreach($entries as $entry) {
+        $layout = $entry->getFieldLayout();
+        $fields = isset($layout) ? $layout->getFields() : [];
+        foreach ($fields as $field) {
+          if ($field instanceof GooglePlacesSyncField) {
+            $value = $entry->getFieldValue($field->handle);
+            // This marks the field as dirty, triggering the sync on save
+            $value['updated'] = time();
+            $entry->setFieldValue($field->handle, $value);
+            Craft::$app->elements->saveElement($entry);
+          }
         }
       }
+      return true;
+    } catch (Exception $e) {
+      return false;
     }
-    return $entries;
   }
 
 
@@ -180,7 +184,7 @@ class CraftGooglePlacesSync extends Component
       // Just being extra-safe with another check
       if (isset($id) && $id !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
-        if ($result['success'] && $result['data'] && $result['data']['result']) {
+        if (isset($result['success']) && isset($result['data']) && isset($result['data']['result'])) {
           $data = array_filter($result['data']['result'], function($key) {
             return array_key_exists($key, $this->apiDetailsMap);
           }, ARRAY_FILTER_USE_KEY);
