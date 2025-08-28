@@ -12,6 +12,7 @@ namespace headjam\craftgoogleplaces\services;
 
 use Craft;
 use Exception;
+use GuzzleHttp\Utils;
 use yii\base\Component;
 use headjam\craftgoogleplaces\CraftGooglePlaces;
 
@@ -71,7 +72,7 @@ class CraftGooglePlacesApi extends Component
         $response = $client->request('GET', $url);
         if ($response->getStatusCode() === 200) {
           $body = $response->getBody()->getContents();
-          $data = \GuzzleHttp\json_decode($body, true);
+          $data = Utils::jsonDecode($body, true);
           return [
             'success' => true,
             'data' => $data

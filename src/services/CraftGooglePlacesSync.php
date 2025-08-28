@@ -80,20 +80,12 @@ class CraftGooglePlacesSync extends Component
   public function sync(ElementInterface $element, Field $field)
   {
     $value = $element->getFieldValue($field->handle);
-    Craft::getLogger()->log("START", Logger::LEVEL_ERROR, 'craft-google-places');
-    Craft::getLogger()->log($element, Logger::LEVEL_ERROR, 'craft-google-places');
-    Craft::getLogger()->log($field, Logger::LEVEL_ERROR, 'craft-google-places');
-    Craft::getLogger()->log($value, Logger::LEVEL_ERROR, 'craft-google-places');
-    Craft::getLogger()->log("END", Logger::LEVEL_ERROR, 'craft-google-places');
     $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
-      Craft::getLogger()->log("ID FOUND", Logger::LEVEL_ERROR, 'craft-google-places');
       return $this->getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      Craft::getLogger()->log("LOOKUP FOUND", Logger::LEVEL_ERROR, 'craft-google-places');
       return $this->getPlaceId($value, $field, $element);
     } else {
-      Craft::getLogger()->log("NO ID OR LOOKUP", Logger::LEVEL_ERROR, 'craft-google-places');
       return true;
     }
   }
