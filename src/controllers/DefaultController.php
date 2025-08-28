@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Places Syncs plugin for Craft CMS 3.x
+ * Google Places Syncs plugin for Craft CMS 5.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -10,11 +10,9 @@
 
 namespace headjam\craftgoogleplaces\controllers;
 
-use headjam\craftgoogleplaces\CraftGooglePlaces;
-
-use Craft;
-use craft\services\Fields;
 use craft\web\Controller;
+use yii\web\Response;
+use headjam\craftgoogleplaces\CraftGooglePlaces;
 
 /**
  * Default Controller
@@ -29,27 +27,28 @@ use craft\web\Controller;
  */
 class DefaultController extends Controller
 {
+    public $defaultAction = 'index';
 
-  // Protected Properties
-  // =========================================================================
-  /**
-   * @var bool|array Allows anonymous access to this controller's actions. The actions must be in 'kebab-case'
-   * @access protected
-   */
-  protected $allowAnonymous = ['index'];
+    // Protected Properties
+    // =========================================================================
+    /**
+     * @var bool|array Allows anonymous access to this controller's actions. The actions must be in 'kebab-case'
+     * @access protected
+     */
+    protected array|int|bool $allowAnonymous = ['index'];
 
 
-    
-  // Public Methods
-  // =========================================================================
-  /**
-   * Get all entries with a GooglePlacesSync field
-   *
-   * @return mixed
-   */
-  public function actionIndex()
-  {
-    $entries = CraftGooglePlaces::getInstance()->googlePlacesSync->syncAll();
-    return $this->asJson($entries);
-  }
+
+    // Public Methods
+    // =========================================================================
+    /**
+     * Get all entries with a GooglePlacesSync field
+     *
+     * @return mixed
+     */
+    public function actionIndex(): Response
+    {
+        $entries = CraftGooglePlaces::getInstance()->googlePlacesSync->syncAll();
+        return $this->asJson($entries);
+    }
 }

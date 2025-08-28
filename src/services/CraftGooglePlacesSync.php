@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Places Syncs plugin for Craft CMS 3.x
+ * Google Places Syncs plugin for Craft CMS 5.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -10,13 +10,14 @@
 
 namespace headjam\craftgoogleplaces\services;
 
-use headjam\craftgoogleplaces\CraftGooglePlaces;
-
 use Craft;
-use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\base\Field;
+use Exception;
+use yii\base\Component;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
+use headjam\craftgoogleplaces\CraftGooglePlaces;
+use yii\log\Logger;
 
 /**
  * CraftGooglePlacesSync Service
@@ -70,7 +71,7 @@ class CraftGooglePlacesSync extends Component
 
   // Public Methods
   // =========================================================================
-  /** 
+  /**
    * Determine if a sync is possible, and send it to the id lookup or details query as needed
    * @param ElementInterface $element - The element that was just saved.
    * @param Field $field - The field that triggered this sync.
@@ -79,17 +80,25 @@ class CraftGooglePlacesSync extends Component
   public function sync(ElementInterface $element, Field $field)
   {
     $value = $element->getFieldValue($field->handle);
+    Craft::getLogger()->log("START", Logger::LEVEL_ERROR, 'craft-google-places');
+    Craft::getLogger()->log($element, Logger::LEVEL_ERROR, 'craft-google-places');
+    Craft::getLogger()->log($field, Logger::LEVEL_ERROR, 'craft-google-places');
+    Craft::getLogger()->log($value, Logger::LEVEL_ERROR, 'craft-google-places');
+    Craft::getLogger()->log("END", Logger::LEVEL_ERROR, 'craft-google-places');
     $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
+      Craft::getLogger()->log("ID FOUND", Logger::LEVEL_ERROR, 'craft-google-places');
       return $this->getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
+      Craft::getLogger()->log("LOOKUP FOUND", Logger::LEVEL_ERROR, 'craft-google-places');
       return $this->getPlaceId($value, $field, $element);
     } else {
+      Craft::getLogger()->log("NO ID OR LOOKUP", Logger::LEVEL_ERROR, 'craft-google-places');
       return true;
     }
   }
 
-  /** 
+  /**
    * Get all entries with the matching field type, update
    * the updated value of the field to mark it as dirty, then
    * save the element, triggering the onElementSave function.
@@ -121,7 +130,7 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
-  /** 
+  /**
    * Return an array of all entries with the custom field type.
    * @return Entry[]
    */
@@ -138,7 +147,7 @@ class CraftGooglePlacesSync extends Component
     return $entries;
   }
 
-  /** 
+  /**
    * Formats the value for the hours array.
    * @param array $hours - The opening hours as returned by the Google Places api.
    * @param array The Craft-ready array.
@@ -165,11 +174,11 @@ class CraftGooglePlacesSync extends Component
   private function coordsFormat(array $coords) {
    if (isset($coords['location']) && isset($coords['location']['lat']) && isset($coords['location']['lng'])) {
     return $coords['location']['lat'] . ',' . $coords['location']['lng'];
-   } 
+   }
    return '';
   }
 
-  /** 
+  /**
    * Query the details for a given GooglePlace and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
    * @param array $value - The existing value for the field.
@@ -206,7 +215,7 @@ class CraftGooglePlacesSync extends Component
     }
   }
 
-  /** 
+  /**
    * Lookup a GooglePlaces place id for a given query and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
    * @param array $value - The existing value for the field.
@@ -214,7 +223,7 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element the field belongs to.
    * @return bool Returns true.
    */
-  private function getPlaceId(array $value, Field $field, ElementInterface $element) 
+  private function getPlaceId(array $value, Field $field, ElementInterface $element)
   {
     try {
       $lookup = $value['lookup'];
@@ -222,9 +231,9 @@ class CraftGooglePlacesSync extends Component
       if (isset($lookup) && $lookup !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeSearch($lookup);
         if (
-          $result['success'] && 
-          $result['data']['candidates'] && 
-          $result['data']['candidates'][0] && 
+          $result['success'] &&
+          $result['data']['candidates'] &&
+          $result['data']['candidates'][0] &&
           $result['data']['candidates'][0]['place_id']
         ) {
           $value['id'] = $result['data']['candidates'][0]['place_id'];

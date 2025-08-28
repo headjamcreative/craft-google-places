@@ -1,44 +1,42 @@
 {
-    "name": "headjam/craft-google-places",
-    "description": "Syncs Google Places API data to entries.",
-    "type": "craft-plugin",
-    "version": "1.1.5",
-    "keywords": [
-        "craft",
-        "cms",
-        "craftcms",
-        "craft-plugin",
-        "craft google places"
-    ],
-    "support": {
-        "docs": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
-        "issues": "https://github.com/headjamcreative/craft-google-places/issues"
-    },
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Ben Norman",
-            "homepage": "https://www.headjam.com.au"
-        }
-    ],
-    "require": {
-        "craftcms/cms": "^3.0.0"
-    },
-    "autoload": {
-        "psr-4": {
-          "headjam\\craftgoogleplaces\\": "src/"
-        }
-    },
-    "extra": {
-        "name": "Google Places Sync",
-        "handle": "craft-google-places",
-        "developer": "Ben Norman",
-        "developerUrl": "https://www.headjam.com.au",
-        "documentationUrl": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
-        "changelogUrl": "https://raw.githubusercontent.com/headjamcreative/craft-google-places/master/CHANGELOG.md",
-        "components": {
-            "craftGooglePlacesService": "headjam\\craftgoogleplaces\\services\\CraftGooglePlacesApi"
-        },
-        "class": "headjam\\craftgoogleplaces\\CraftGooglePlaces"
+  "name": "headjam/craft-google-places",
+  "description": "Syncs Google Places API data to entries.",
+  "type": "craft-plugin",
+  "version": "2.0.0",
+  "license": "mit",
+  "require": {
+    "php": ">=8.2",
+    "craftcms/cms": "^5.8.0"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main"
+  },
+  "autoload": {
+    "psr-4": {
+      "headjam\\craftgoogleplaces\\": "src/"
     }
+  },
+  "extra": {
+    "handle": "craft-google-places",
+    "name": "Google Places Sync",
+    "developer": "Headjam",
+    "documentationUrl": "https://github.com/headjamcreative/craft-google-places/blob/master/README.md",
+    "changelogUrl": "https://raw.githubusercontent.com/headjamcreative/craft-google-places/master/CHANGELOG.md",
+    "class": "headjam\\craftgoogleplaces\\CraftGooglePlaces"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --ansi --fix",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "config": {
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
+  }
 }

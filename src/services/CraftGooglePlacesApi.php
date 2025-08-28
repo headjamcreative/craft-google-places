@@ -1,19 +1,19 @@
 <?php
 /**
- * Google Places Syncs plugin for Craft CMS 3.x
+ * Google Places Syncs plugin for Craft CMS 5.x
  *
  * Syncs Google Places API data to entries.
  *
  * @link      https://www.headjam.com.au
- * @copyright Copyright (c) 2020 Ben Norman
+ * @copyright Copyright (c) 2020 Headjam
  */
 
 namespace headjam\craftgoogleplaces\services;
 
-use headjam\craftgoogleplaces\CraftGooglePlaces;
-
 use Craft;
-use craft\base\Component;
+use Exception;
+use yii\base\Component;
+use headjam\craftgoogleplaces\CraftGooglePlaces;
 
 /**
  * CraftGooglePlacesApi Service
@@ -41,7 +41,7 @@ class CraftGooglePlacesApi extends Component
     return $this->googleApiRequest('place/findplacefromtext', $params);
   }
 
-  /** 
+  /**
    * Get all the details of a place based on it's Google-assigned place_id.
    * @param string $placeId - The Google place_id to query by.
    * @return array An array containing a status and either error or data properties.
@@ -55,7 +55,7 @@ class CraftGooglePlacesApi extends Component
 
   // Private Methods
   // =========================================================================
-  /** 
+  /**
    * Format a Google Maps api request.
    * @param string $endpoint - The endpoint to query.
    * @param string $params - The query string items to append to the request.

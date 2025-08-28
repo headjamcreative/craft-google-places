@@ -1,10 +1,10 @@
-# Google Places Sync plugin for Craft CMS 3.x
+# Google Places Sync plugin for Craft CMS 5.x
 
 Syncs Google Places API data to entries.
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0-beta.23 or later.
+This plugin requires Craft CMS 5.8.0 or later.
 
 ## Installation
 
