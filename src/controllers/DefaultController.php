@@ -10,9 +10,12 @@
 
 namespace headjam\craftgoogleplaces\controllers;
 
+use Craft;
+use craft\helpers\Queue;
 use craft\web\Controller;
 use yii\web\Response;
 use headjam\craftgoogleplaces\CraftGooglePlaces;
+use headjam\craftgoogleplaces\jobs\SyncAllPlaces;
 
 /**
  * Default Controller
@@ -48,7 +51,11 @@ class DefaultController extends Controller
      */
     public function actionIndex(): Response
     {
-        $entries = CraftGooglePlaces::getInstance()->googlePlacesSync->syncAll();
-        return $this->asJson($entries);
+      try {
+        Queue::push(new SyncAllPlaces());
+        return $this->asJson(['success' => true]);
+      } catch (\Throwable $e) {
+        return $this->asJson(['success' => false]);
+      }
     }
 }

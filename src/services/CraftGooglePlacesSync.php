@@ -90,34 +90,6 @@ class CraftGooglePlacesSync extends Component
     }
   }
 
-  /**
-   * Get all entries with the matching field type, update
-   * the updated value of the field to mark it as dirty, then
-   * save the element, triggering the onElementSave function.
-   */
-  public function syncAll()
-  {
-    try {
-      $entries = $this->entriesWithField();
-      foreach($entries as $entry) {
-        $layout = $entry->getFieldLayout();
-        $fields = isset($layout) ? $layout->getFields() : [];
-        foreach ($fields as $field) {
-          if ($field instanceof GooglePlacesSyncField) {
-            $value = $entry->getFieldValue($field->handle);
-            // This marks the field as dirty, triggering the sync on save
-            $value['updated'] = time();
-            $entry->setFieldValue($field->handle, $value);
-            Craft::$app->elements->saveElement($entry);
-          }
-        }
-      }
-      return true;
-    } catch (Exception $e) {
-      return false;
-    }
-  }
-
 
 
   // Private Methods
