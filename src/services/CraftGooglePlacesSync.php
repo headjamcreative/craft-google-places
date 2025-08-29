@@ -95,23 +95,6 @@ class CraftGooglePlacesSync extends Component
   // Private Methods
   // =========================================================================
   /**
-   * Return an array of all entries with the custom field type.
-   * @return Entry[]
-   */
-  private function entriesWithField() {
-    $allFields = CraftGooglePlaces::getInstance()->fields->getAllFields('global');
-    $searchQuery = '';
-    foreach($allFields as $field) {
-      if ($field instanceof GooglePlacesSyncField) {
-        $searchQuery = ' OR ' . $field->handle . ':*';
-      }
-    }
-    $searchQuery = preg_replace('/ OR /', '', $searchQuery, 1);
-    $entries = strlen($searchQuery) ? \craft\elements\Entry::find()->search($searchQuery)->unique()->all() : [];
-    return $entries;
-  }
-
-  /**
    * Formats the value for the name.
    * @param array $name - The name as returned by the Google Places api.
    * @return string The Craft-ready name.
