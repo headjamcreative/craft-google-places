@@ -33,37 +33,37 @@ class CraftGooglePlacesSync extends Component
   // Private Properties
   // =========================================================================
   private $apiDetailsMap = [
-    'name' => [
+    'id' => [
+      'key' => 'id',
+      'format' => 'simple'
+    ],
+    'displayName' => [
       'key' => 'name',
-      'format' => 'simple'
+      'format' => 'nameFormat'
     ],
-    'formatted_address' => [
-      'key' => 'address',
-      'format' => 'simple'
-    ],
-    'formatted_phone_number' => [
+    'nationalPhoneNumber' => [
       'key' => 'phone',
       'format' => 'simple'
     ],
-    'website' => [
-      'key' => 'website',
+    'formattedAddress' => [
+      'key' => 'address',
       'format' => 'simple'
     ],
-    'url' => [
-      'key' => 'googleUrl',
-      'format' => 'simple'
-    ],
-    'opening_hours' => [
-      'key' => 'hours',
-      'format' => 'hoursFormat',
-    ],
-    'geometry' => [
+    'location' => [
       'key' => 'coordinates',
       'format' => 'coordsFormat'
     ],
-    'reviews' => [
-      'key' => 'reviews',
+    'googleMapsLinks' => [
+      'key' => 'googleUrl',
+      'format' => 'googleUrlFormat'
+    ],
+    'websiteUri' => [
+      'key' => 'website',
       'format' => 'simple'
+    ],
+    'regularOpeningHours' => [
+      'key' => 'hours',
+      'format' => 'hoursFormat'
     ]
   ];
 
@@ -84,7 +84,7 @@ class CraftGooglePlacesSync extends Component
     if (isset($value['id']) && $value['id'] !== '') {
       return $this->getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      return $this->getPlaceId($value, $field, $element);
+      return self::getPlaceId($value, $field, $element);
     } else {
       return true;
     }
@@ -140,22 +140,23 @@ class CraftGooglePlacesSync extends Component
   }
 
   /**
-   * Formats the value for the hours array.
-   * @param array $hours - The opening hours as returned by the Google Places api.
-   * @param array The Craft-ready array.
+   * Formats the value for the name.
+   * @param array $name - The name as returned by the Google Places api.
+   * @return string The Craft-ready name.
    */
-  private function hoursFormat(array $hours)
+  private function nameFormat(array $name)
   {
-    if (array_key_exists('weekday_text', $hours) && gettype($hours['weekday_text'] == 'array')) {
-      return array_map(function(string $hourRow) {
-        $dayTime = explode(': ', $hourRow);
-        return [
-          'label' => $dayTime[0],
-          'hours' => $dayTime[1]
-        ];
-      }, $hours['weekday_text']);
-    }
-    return [];
+    return $name['text'] ?? '';
+  }
+
+  /**
+   * Formats the Google URL.
+   * @param array $url - The URL as returned by the Google Places api.
+   * @return string The Craft-ready URL.
+   */
+  private function googleUrlFormat(array $url)
+  {
+    return $url['reviewsUri'] ?? '';
   }
 
   /**
@@ -164,10 +165,58 @@ class CraftGooglePlacesSync extends Component
    * @param array The Craft-ready array.
    */
   private function coordsFormat(array $coords) {
-   if (isset($coords['location']) && isset($coords['location']['lat']) && isset($coords['location']['lng'])) {
-    return $coords['location']['lat'] . ',' . $coords['location']['lng'];
-   }
-   return '';
+    if (isset($coords['latitude']) && isset($coords['longitude'])) {
+      return $coords['latitude'] . ',' . $coords['longitude'];
+    }
+
+    return '';
+  }
+
+  /**
+   * Formats the value for the hours array.
+   * @param array $hours - The opening hours as returned by the Google Places api.
+   * @param array The Craft-ready array.
+   */
+  private function hoursFormat(array $hours)
+  {
+    if (array_key_exists('weekdayDescriptions', $hours) && gettype($hours['weekdayDescriptions']) == 'array') {
+      return array_map(function(string $hourRow) {
+        $dayTime = explode(': ', $hourRow);
+        return [
+          'label' => $dayTime[0],
+          'hours' => $dayTime[1]
+        ];
+      }, $hours['weekdayDescriptions']);
+    }
+    return [];
+  }
+
+  /**
+   * Set the place details on the element.
+   * @param array $data - The place data from the API.
+   * @param Field $field - The field to set the data on.
+   * @param ElementInterface $element - The element to set the data on.
+   * @return bool
+   */
+  private function setPlaceDetails(array $data, Field $field, ElementInterface $element): bool
+  {
+    $data = array_filter($data, function($key) {
+      return array_key_exists($key, $this->apiDetailsMap);
+    }, ARRAY_FILTER_USE_KEY);
+
+    foreach ($data as $key => $val) {
+      $format = $this->apiDetailsMap[$key]['format'];
+      if ($format == 'simple') {
+        $value[$this->apiDetailsMap[$key]['key']] = $val;
+      } else {
+        $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
+      }
+    }
+    $value["updated"] = date('Y-m-d H:i:s');
+
+    $element->setFieldValue($field->handle, $value);
+
+    return true;
   }
 
   /**
@@ -182,27 +231,15 @@ class CraftGooglePlacesSync extends Component
   {
     try {
       $id = $value['id'];
-      // Just being extra-safe with another check
       if (isset($id) && $id !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
-        if (isset($result['success']) && isset($result['data']) && isset($result['data']['result'])) {
-          $data = array_filter($result['data']['result'], function($key) {
-            return array_key_exists($key, $this->apiDetailsMap);
-          }, ARRAY_FILTER_USE_KEY);
-          foreach ($data as $key => $val) {
-            $format = $this->apiDetailsMap[$key]['format'];
-            if ($format == 'simple') {
-              $value[$this->apiDetailsMap[$key]['key']] = $val;
-            } else {
-              $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
-            }
-          }
-          $element->setFieldValue($field->handle, $value);
+        if (isset($result['success']) && isset($result['data'])) {
+          return $this->setPlaceDetails($result['data'], $field, $element);
         }
       }
+
       return true;
     } catch (Exception $error) {
-      // We'll continue to save anyway
       return true;
     }
   }
@@ -224,18 +261,14 @@ class CraftGooglePlacesSync extends Component
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeSearch($lookup);
         if (
           $result['success'] &&
-          $result['data']['candidates'] &&
-          $result['data']['candidates'][0] &&
-          $result['data']['candidates'][0]['place_id']
+          $result['data']['places'][0]['id'] ?? false
         ) {
-          $value['id'] = $result['data']['candidates'][0]['place_id'];
-          $element->setFieldValue($field->handle, $value);
-          return $this->getPlaceDetails($value, $field, $element);
+          return $this->setPlaceDetails($result['data']['places'][0], $field, $element);
         }
       }
+
       return true;
     } catch (Exception $error) {
-      // We'll continue to save anyway
       return true;
     }
   }

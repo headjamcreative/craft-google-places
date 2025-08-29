@@ -29,17 +29,40 @@ use headjam\craftgoogleplaces\CraftGooglePlaces;
  */
 class CraftGooglePlacesApi extends Component
 {
+  // Static Properties
+  // =========================================================================
+  private static array $fields = [
+    'id',
+    'displayName',
+    'nationalPhoneNumber',
+    'formattedAddress',
+    'location.latitude',
+    'location.longitude',
+    'googleMapsLinks.reviewsUri',
+    'websiteUri',
+    'regularOpeningHours',
+  ];
+
+  private function placesFields(): array {
+    return array_map(fn($field) => "places.$field", self::$fields);
+  }
+
   // Public Methods
   // =========================================================================
   /**
    * Lookup a business in Google Places via either a phone number, business name, or address.
    * @return array An array containing a status and either error or data properties.
    */
-  public function placeSearch(string $input)
+  public function placeSearch(string $input): mixed
   {
-    $type = $input[0] == '+' && strlen($input) >= 11 ? 'phonenumber' : 'textquery';
-    $params = '&inputtype=' . $type . '&input=' . urlencode($input);
-    return $this->googleApiRequest('place/findplacefromtext', $params);
+    $response = $this->googleApiRequest(
+      ':searchText',
+      'POST',
+      self::placesFields(),
+      ['body' => json_encode(['textQuery' => $input])],
+    );
+
+    return $response;
   }
 
   /**
@@ -49,7 +72,8 @@ class CraftGooglePlacesApi extends Component
    */
   public function placeDetails(string $placeId)
   {
-    return $this->googleApiRequest('place/details', '&place_id=' . urlencode($placeId));
+    $response = $this->googleApiRequest('/' . urlencode($placeId), 'GET', self::$fields);
+    return $response;
   }
 
 
@@ -59,17 +83,17 @@ class CraftGooglePlacesApi extends Component
   /**
    * Format a Google Maps api request.
    * @param string $endpoint - The endpoint to query.
-   * @param string $params - The query string items to append to the request.
+   * @param array $params - The query string items to append to the request.
    * @return array An array containing a status and either error or data properties.
    */
-  private function googleApiRequest(string $endpoint, string $params)
+  private function googleApiRequest(string $endpoint, string $method, array $fields = [], array $params = [])
   {
     try {
       $key = CraftGooglePlaces::getInstance()->getSettings()->googleApiKey;
       if (isset($key) && $key !== '') {
         $client = new \GuzzleHttp\Client();
-        $url = 'https://maps.googleapis.com/maps/api/' . $endpoint . '/json?key=' . $key . $params;
-        $response = $client->request('GET', $url);
+        $url = 'https://places.googleapis.com/v1/places' . $endpoint . '?fields=' . implode(',', $fields) . '&key=' . $key;
+        $response = $client->request($method, $url, $params);
         if ($response->getStatusCode() === 200) {
           $body = $response->getBody()->getContents();
           $data = Utils::jsonDecode($body, true);
