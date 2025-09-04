@@ -10,18 +10,19 @@
 namespace headjam\craftgoogleplaces;
 
 use Craft;
+use Monolog\Formatter\LineFormatter;
+use Psr\Log\LogLevel;
 use craft\base\Model;
 use craft\base\Plugin;
 use craft\events\RegisterComponentTypesEvent;
+use craft\log\MonologTarget;
 use craft\services\Fields;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync;
 use headjam\craftgoogleplaces\models\Settings;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesApi;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesSync;
+use headjam\craftgoogleplaces\web\twig\SyncPlacesData;
 use yii\base\Event;
-use Psr\Log\LogLevel;
-use craft\log\MonologTarget;
-use Monolog\Formatter\LineFormatter;
 use yii\log\Logger;
 
 /**
@@ -113,7 +114,10 @@ class CraftGooglePlaces extends Plugin
             ),
         ]);
 
+        Craft::error('Craft Google Places init', 'craft-google-places');
+
         $this->attachEventHandlers();
+        Craft::$app->view->registerTwigExtension(new SyncPlacesData());
     }
 
     // Protected Methods

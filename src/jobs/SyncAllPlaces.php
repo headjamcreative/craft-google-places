@@ -35,6 +35,7 @@ class SyncAllPlaces extends BaseJob
             ])
           );
 
+          // Triggers the sync process
           Craft::$app->elements->saveElement($entry);
         }
     }

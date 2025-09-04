@@ -4,6 +4,7 @@ namespace headjam\craftgoogleplaces\models;
 
 use Craft;
 use craft\base\Model;
+use craft\behaviors\EnvAttributeParserBehavior;
 
 /**
  * Google Places Sync settings
@@ -20,6 +21,19 @@ class Settings extends Model
 
     // Public Methods
     // =========================================================================
+    /**
+     * Adds the .env parser behavior for the model.
+     */
+    public function behaviors(): array
+    {
+        return [
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => ['googleApiKey'],
+            ],
+        ];
+    }
+
     /**
      * Returns the validation rules for attributes.
      *

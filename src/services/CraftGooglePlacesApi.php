@@ -11,6 +11,7 @@
 namespace headjam\craftgoogleplaces\services;
 
 use Craft;
+use craft\helpers\App;
 use Exception;
 use GuzzleHttp\Utils;
 use yii\base\Component;
@@ -91,6 +92,7 @@ class CraftGooglePlacesApi extends Component
     try {
       $key = CraftGooglePlaces::getInstance()->getSettings()->googleApiKey;
       if (isset($key) && $key !== '') {
+        $key = App::parseEnv($key);
         $client = new \GuzzleHttp\Client();
         $url = 'https://places.googleapis.com/v1/places' . $endpoint . '?fields=' . implode(',', $fields) . '&key=' . $key;
         $response = $client->request($method, $url, $params);

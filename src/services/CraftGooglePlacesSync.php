@@ -82,7 +82,7 @@ class CraftGooglePlacesSync extends Component
     $value = $element->getFieldValue($field->handle);
     $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
-      return $this->getPlaceDetails($value, $field, $element);
+      return self::getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
       return self::getPlaceId($value, $field, $element);
     } else {
@@ -185,11 +185,15 @@ class CraftGooglePlacesSync extends Component
   private function getPlaceDetails(array $value, Field $field, ElementInterface $element)
   {
     try {
+      Craft::error('getPlaceDetails1', 'craft-google-places');
       $id = $value['id'];
       if (isset($id) && $id !== '') {
+        Craft::error('getPlaceDetails2', 'craft-google-places');
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
+        Craft::error('getPlaceDetails3' . json_encode($result), 'craft-google-places');
         if (isset($result['success']) && isset($result['data'])) {
-          return $this->setPlaceDetails($result['data'], $field, $element);
+          Craft::error('getPlaceDetails4', 'craft-google-places');
+          return self::setPlaceDetails($result['data'], $field, $element);
         }
       }
 
@@ -218,7 +222,7 @@ class CraftGooglePlacesSync extends Component
           $result['success'] &&
           $result['data']['places'][0]['id'] ?? false
         ) {
-          return $this->setPlaceDetails($result['data']['places'][0], $field, $element);
+          return self::setPlaceDetails($result['data']['places'][0], $field, $element);
         }
       }
 
