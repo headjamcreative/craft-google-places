@@ -114,8 +114,6 @@ class CraftGooglePlaces extends Plugin
             ),
         ]);
 
-        Craft::error('Craft Google Places init', 'craft-google-places');
-
         $this->attachEventHandlers();
         Craft::$app->view->registerTwigExtension(new SyncPlacesData());
     }

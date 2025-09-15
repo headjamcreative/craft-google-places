@@ -185,14 +185,10 @@ class CraftGooglePlacesSync extends Component
   private function getPlaceDetails(array $value, Field $field, ElementInterface $element)
   {
     try {
-      Craft::error('getPlaceDetails1', 'craft-google-places');
       $id = $value['id'];
       if (isset($id) && $id !== '') {
-        Craft::error('getPlaceDetails2', 'craft-google-places');
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
-        Craft::error('getPlaceDetails3' . json_encode($result), 'craft-google-places');
         if (isset($result['success']) && isset($result['data'])) {
-          Craft::error('getPlaceDetails4', 'craft-google-places');
           return self::setPlaceDetails($result['data'], $field, $element);
         }
       }
