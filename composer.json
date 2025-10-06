@@ -2,7 +2,6 @@
   "name": "headjam/craft-google-places",
   "description": "Syncs Google Places API data to entries.",
   "type": "craft-plugin",
-  "version": "2.0.0",
   "license": "mit",
   "require": {
     "php": ">=8.2",
