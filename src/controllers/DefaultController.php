@@ -58,26 +58,4 @@ class DefaultController extends Controller
         return $this->asJson(['success' => false]);
       }
     }
-
-    /**
-     * Get a single place by its Place ID
-     *
-     * @param string $placeId
-     * @return mixed
-     */
-    public function actionPlace(string $placeId): Response
-    {
-      try {
-        $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($placeId);
-        if (isset($result['error'])) {
-          Craft::error('Error fetching place: ' . $result['error'], 'craft-google-places');
-          return $this->asJson(['success' => false]);
-        }
-
-        return $this->asJson(['success' => true, 'result' => $result]);
-      } catch (\Throwable $e) {
-        Craft::error('Error fetching place: ' . $e->getMessage(), 'craft-google-places');
-        return $this->asJson(['success' => false]);
-      }
-    }
 }
