@@ -17,6 +17,7 @@ use Exception;
 use yii\base\Component;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 use headjam\craftgoogleplaces\CraftGooglePlaces;
+use headjam\craftgoogleplaces\models\GooglePlaceModel;
 use yii\log\Logger;
 
 /**
@@ -80,7 +81,6 @@ class CraftGooglePlacesSync extends Component
   public function sync(ElementInterface $element, Field $field)
   {
     $value = $element->getFieldValue($field->handle);
-    $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
       return self::getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
@@ -130,9 +130,9 @@ class CraftGooglePlacesSync extends Component
   /**
    * Formats the value for the hours array.
    * @param array $hours - The opening hours as returned by the Google Places api.
-   * @param array The Craft-ready array.
+   * @return array The Craft-ready array.
    */
-  private function hoursFormat(array $hours)
+  private function hoursFormat(array $hours): array
   {
     if (array_key_exists('weekdayDescriptions', $hours) && gettype($hours['weekdayDescriptions']) == 'array') {
       return array_map(function(string $hourRow) {
@@ -155,23 +155,29 @@ class CraftGooglePlacesSync extends Component
    */
   private function setPlaceDetails(array $data, Field $field, ElementInterface $element): bool
   {
-    $data = array_filter($data, function($key) {
-      return array_key_exists($key, $this->apiDetailsMap);
-    }, ARRAY_FILTER_USE_KEY);
+    try {
+        $data = array_filter($data, function($key) {
+          return array_key_exists($key, $this->apiDetailsMap);
+        }, ARRAY_FILTER_USE_KEY);
 
-    foreach ($data as $key => $val) {
-      $format = $this->apiDetailsMap[$key]['format'];
-      if ($format == 'simple') {
-        $value[$this->apiDetailsMap[$key]['key']] = $val;
-      } else {
-        $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
-      }
+        $model = new GooglePlaceModel();
+        $model->placeId = $data['id'];
+        $model->displayName = $data['displayName']['text'];
+        $model->nationalPhoneNumber = $data['nationalPhoneNumber'] ?? null;
+        $model->formattedAddress = $data['formattedAddress'] ?? null;
+        $model->locationLatitude = (float)$data['location']['latitude'] ?? null;
+        $model->locationLongitude = (float)$data['location']['longitude'] ?? null;
+        $model->googleMapsLinksReviewsUri = $data['googleMapsLinks']['reviewsUri'] ?? null;
+        $model->websiteUri = $data['websiteUri'] ?? null;
+        $model->regularOpeningHours = $data['regularOpeningHours'] ?? null ? self::hoursFormat($data['regularOpeningHours'] ?? null) : null;
+
+        CraftGooglePlaces::getInstance()->googlePlacesPersist->saveGooglePlaceData($model);
+
+        return true;
+    } catch (Exception $error) {
+        Craft::error('Error setting place details: ' . $data['displayName']['text'] . ' - ' . $error->getMessage(), 'craft-google-places');
+        return false;
     }
-    $value["updated"] = date('Y-m-d H:i:s');
-
-    $element->setFieldValue($field->handle, $value);
-
-    return true;
   }
 
   /**

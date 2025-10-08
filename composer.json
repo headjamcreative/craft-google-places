@@ -3,6 +3,7 @@
   "description": "Syncs Google Places API data to entries.",
   "type": "craft-plugin",
   "license": "mit",
+  "version": "2.0.3",
   "require": {
     "php": ">=8.2",
     "craftcms/cms": "^5.8.0"

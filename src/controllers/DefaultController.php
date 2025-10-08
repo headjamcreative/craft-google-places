@@ -38,7 +38,7 @@ class DefaultController extends Controller
      * @var bool|array Allows anonymous access to this controller's actions. The actions must be in 'kebab-case'
      * @access protected
      */
-    protected array|int|bool $allowAnonymous = ['index'];
+    protected array|int|bool $allowAnonymous = ['index', 'place'];
 
 
 
@@ -55,6 +55,28 @@ class DefaultController extends Controller
         Queue::push(new SyncAllPlaces());
         return $this->asJson(['success' => true]);
       } catch (\Throwable $e) {
+        return $this->asJson(['success' => false]);
+      }
+    }
+
+    /**
+     * Get a single place by its Place ID
+     *
+     * @param string $placeId
+     * @return mixed
+     */
+    public function actionPlace(string $placeId): Response
+    {
+      try {
+        $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($placeId);
+        if (isset($result['error'])) {
+          Craft::error('Error fetching place: ' . $result['error'], 'craft-google-places');
+          return $this->asJson(['success' => false]);
+        }
+
+        return $this->asJson(['success' => true, 'result' => $result]);
+      } catch (\Throwable $e) {
+        Craft::error('Error fetching place: ' . $e->getMessage(), 'craft-google-places');
         return $this->asJson(['success' => false]);
       }
     }

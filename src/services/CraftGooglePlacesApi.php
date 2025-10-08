@@ -107,7 +107,7 @@ class CraftGooglePlacesApi extends Component
       }
       return [
         'status' => false,
-        'error' => 'Server Error'
+        'error' => 'Google API key not set'
       ];
     } catch (Exception $error) {
       return [

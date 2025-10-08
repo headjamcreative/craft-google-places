@@ -20,6 +20,7 @@ use craft\services\Fields;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync;
 use headjam\craftgoogleplaces\models\Settings;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesApi;
+use headjam\craftgoogleplaces\services\CraftGooglePlacesPersist;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesSync;
 use headjam\craftgoogleplaces\web\twig\SyncPlacesData;
 use yii\base\Event;
@@ -34,6 +35,7 @@ use yii\log\Logger;
  * @copyright Headjam
  * @license MIT
  * @property-read CraftGooglePlacesApi $craftGooglePlacesApi
+ * @property-read CraftGooglePlacesPersist $craftGooglePlacesPersist
  * @property-read CraftGooglePlacesSync $craftGooglePlacesSync
  */
 class CraftGooglePlaces extends Plugin
@@ -55,7 +57,7 @@ class CraftGooglePlaces extends Plugin
      *
      * @var string
      */
-    public string $schemaVersion = '2.0.0';
+    public string $schemaVersion = '2.0.3';
 
     /**
      * Set to `true` if the plugin should have a settings view in the control panel.
@@ -80,7 +82,11 @@ class CraftGooglePlaces extends Plugin
     public static function config(): array
     {
         return [
-            'components' => ['googlePlacesApi' => CraftGooglePlacesApi::class, 'googlePlacesSync' => CraftGooglePlacesSync::class],
+            'components' => [
+              'googlePlacesApi' => CraftGooglePlacesApi::class,
+              'googlePlacesPersist' => CraftGooglePlacesPersist::class,
+              'googlePlacesSync' => CraftGooglePlacesSync::class,
+            ],
         ];
     }
 
