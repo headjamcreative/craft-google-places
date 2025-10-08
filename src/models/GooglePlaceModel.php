@@ -77,7 +77,7 @@ class GooglePlaceModel extends Model
     public function rules(): array
     {
         return [
-            [['placeId', 'displayName'], 'required'],
+            [['placeId', 'displayName', 'location'], 'required'],
             [['locationLatitude', 'locationLongitude'], 'number'],
             [['regularOpeningHours'], 'safe'],
         ];

@@ -46,7 +46,7 @@
             instructions: 'The name of the business.',
             id: 'name',
             name: name ~ '[name]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.name ?? ''
           })
         }}
@@ -57,7 +57,7 @@
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
             id: 'address',
             name: name ~ '[address]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.address ?? ''
           })
         }}
@@ -68,7 +68,7 @@
             instructions: 'The phone number of the business.',
             id: 'phone',
             name: name ~ '[phone]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.phone ?? ''
           })
         }}
@@ -79,7 +79,7 @@
             instructions: 'The website of the business.',
             id: 'website',
             name: name ~ '[website]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.website ?? ''
           })
         }}
@@ -90,7 +90,7 @@
             instructions: 'The Google url for maps and reviews.',
             id: 'googleUrl',
             name: name ~ '[googleUrl]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.googleUrl ?? ''
           })
         }}
@@ -101,12 +101,13 @@
             instructions: 'If alternate coordinates are supplied below, this will be ignored..',
             id: 'coordinates',
             name: name ~ '[coordinates]',
-            readonly: dataSyncing,
+            placeholder: 'Test',
             value: value.coordinates ?? ''
           })
         }}
 
-        {% set hoursVal = (value.hours ?? false) is iterable ? value.hours : [] %}
+        {%- set weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] -%}
+        {% set hoursVal = (value.hours ?? false) is iterable ? value.hours : weekdays|map(day => {label: day, hours: ''}) %}
         {{
           forms.editableTableField({
             label: 'Hours',

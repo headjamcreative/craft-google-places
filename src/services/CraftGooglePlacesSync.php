@@ -18,7 +18,6 @@ use yii\base\Component;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 use headjam\craftgoogleplaces\CraftGooglePlaces;
 use headjam\craftgoogleplaces\models\GooglePlaceModel;
-use yii\log\Logger;
 
 /**
  * CraftGooglePlacesSync Service
@@ -34,38 +33,14 @@ class CraftGooglePlacesSync extends Component
   // Private Properties
   // =========================================================================
   private $apiDetailsMap = [
-    'id' => [
-      'key' => 'id',
-      'format' => 'simple'
-    ],
-    'displayName' => [
-      'key' => 'name',
-      'format' => 'nameFormat'
-    ],
-    'nationalPhoneNumber' => [
-      'key' => 'phone',
-      'format' => 'simple'
-    ],
-    'formattedAddress' => [
-      'key' => 'address',
-      'format' => 'simple'
-    ],
-    'location' => [
-      'key' => 'coordinates',
-      'format' => 'coordsFormat'
-    ],
-    'googleMapsLinks' => [
-      'key' => 'googleUrl',
-      'format' => 'googleUrlFormat'
-    ],
-    'websiteUri' => [
-      'key' => 'website',
-      'format' => 'simple'
-    ],
-    'regularOpeningHours' => [
-      'key' => 'hours',
-      'format' => 'hoursFormat'
-    ]
+    'id',
+    'displayName',
+    'nationalPhoneNumber',
+    'formattedAddress',
+    'location',
+    'googleMapsLinks',
+    'websiteUri',
+    'regularOpeningHours',
   ];
 
 
@@ -82,9 +57,9 @@ class CraftGooglePlacesSync extends Component
   {
     $value = $element->getFieldValue($field->handle);
     if (isset($value['id']) && $value['id'] !== '') {
-      return self::getPlaceDetails($value, $field, $element);
+      return self::getPlaceDetails($value);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      return self::getPlaceId($value, $field, $element);
+      return self::getPlaceId($value);
     } else {
       return true;
     }
@@ -94,39 +69,6 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
-  /**
-   * Formats the value for the name.
-   * @param array $name - The name as returned by the Google Places api.
-   * @return string The Craft-ready name.
-   */
-  private function nameFormat(array $name)
-  {
-    return $name['text'] ?? '';
-  }
-
-  /**
-   * Formats the Google URL.
-   * @param array $url - The URL as returned by the Google Places api.
-   * @return string The Craft-ready URL.
-   */
-  private function googleUrlFormat(array $url)
-  {
-    return $url['reviewsUri'] ?? '';
-  }
-
-  /**
-   * Formats the value for the location coordinates.
-   * @param array $coords - The geometry as returned by the Google Places api.
-   * @param array The Craft-ready array.
-   */
-  private function coordsFormat(array $coords) {
-    if (isset($coords['latitude']) && isset($coords['longitude'])) {
-      return $coords['latitude'] . ',' . $coords['longitude'];
-    }
-
-    return '';
-  }
-
   /**
    * Formats the value for the hours array.
    * @param array $hours - The opening hours as returned by the Google Places api.
@@ -153,11 +95,11 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element to set the data on.
    * @return bool
    */
-  private function setPlaceDetails(array $data, Field $field, ElementInterface $element): bool
+  private function setPlaceDetails(array $data): bool
   {
     try {
         $data = array_filter($data, function($key) {
-          return array_key_exists($key, $this->apiDetailsMap);
+          return in_array($key, $this->apiDetailsMap);
         }, ARRAY_FILTER_USE_KEY);
 
         $model = new GooglePlaceModel();
@@ -165,9 +107,9 @@ class CraftGooglePlacesSync extends Component
         $model->displayName = $data['displayName']['text'];
         $model->nationalPhoneNumber = $data['nationalPhoneNumber'] ?? null;
         $model->formattedAddress = $data['formattedAddress'] ?? null;
-        $model->locationLatitude = (float)$data['location']['latitude'] ?? null;
-        $model->locationLongitude = (float)$data['location']['longitude'] ?? null;
-        $model->googleMapsLinksReviewsUri = $data['googleMapsLinks']['reviewsUri'] ?? null;
+        $model->locationLatitude = $data['location'] ?? null ? (float)$data['location']['latitude'] ?? null : null;
+        $model->locationLongitude = $data['location'] ?? null ? (float)$data['location']['longitude'] ?? null : null;
+        $model->googleMapsLinksReviewsUri = $data['googleMapsLinks'] ?? null ? $data['googleMapsLinks']['reviewsUri'] ?? null : null;
         $model->websiteUri = $data['websiteUri'] ?? null;
         $model->regularOpeningHours = $data['regularOpeningHours'] ?? null ? self::hoursFormat($data['regularOpeningHours'] ?? null) : null;
 
@@ -188,19 +130,20 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element the field belongs to.
    * @return bool Returns true.
    */
-  private function getPlaceDetails(array $value, Field $field, ElementInterface $element)
+  private function getPlaceDetails(array $value)
   {
     try {
       $id = $value['id'];
       if (isset($id) && $id !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
         if (isset($result['success']) && isset($result['data'])) {
-          return self::setPlaceDetails($result['data'], $field, $element);
+          return self::setPlaceDetails($result['data']);
         }
       }
 
       return true;
     } catch (Exception $error) {
+      Craft::error('Error getting place details: ' . $error->getMessage(), 'craft-google-places');
       return true;
     }
   }
@@ -213,7 +156,7 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element the field belongs to.
    * @return bool Returns true.
    */
-  private function getPlaceId(array $value, Field $field, ElementInterface $element)
+  private function getPlaceId(array $value)
   {
     try {
       $lookup = $value['lookup'];
@@ -224,7 +167,7 @@ class CraftGooglePlacesSync extends Component
           $result['success'] &&
           $result['data']['places'][0]['id'] ?? false
         ) {
-          return self::setPlaceDetails($result['data']['places'][0], $field, $element);
+          return self::setPlaceDetails($result['data']['places'][0]);
         }
       }
 
