@@ -36,7 +36,11 @@ class SyncAllPlaces extends BaseJob
           );
 
           // Triggers the sync process
-          Craft::$app->elements->saveElement($entry);
+          try {
+            Craft::$app->elements->saveElement($entry);
+          } catch (\Throwable $e) {
+            Craft::error('Google Places sync failed for entry ID ' . $entry->id . ': ' . $e->getMessage(), 'craft-google-places');
+          }
         }
     }
 

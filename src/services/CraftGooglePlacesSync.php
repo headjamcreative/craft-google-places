@@ -54,11 +54,11 @@ class CraftGooglePlacesSync extends Component
    * @param Field $field - The field that triggered this sync.
    * @return bool Returns true to ensure element saves.
    */
-  public function sync(string $placeId, string $lookup)
+  public function sync(?string $placeId = null, ?string $lookup = null)
   {
-    if ($placeId) {
+    if ($placeId !== null) {
       return self::getPlaceDetails($placeId);
-    } else if ($lookup) {
+    } else if ($lookup !== null) {
       return self::getPlaceId($lookup);
     } else {
       return true;

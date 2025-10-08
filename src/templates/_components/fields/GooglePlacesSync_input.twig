@@ -16,7 +16,7 @@
 {%- set dataSyncing = value.id ?? false or value.lookup ?? false -%}
 {%- set recordData = syncPlacesData({
   id: value.id,
-  lookup: value.lookup
+  lookup: value.lookup ?? null
 }) -%}
 
 {% import "_includes/forms" as forms %}
@@ -135,7 +135,7 @@
           })
         }}
 
-        {%- set hoursVal = value.hours is iterable ? value.hours : [] -%}
+        {%- set hoursVal = value.hours is defined and value.hours is iterable ? value.hours : [] -%}
         {{
           forms.editableTableField({
             label: 'Override Hours',
