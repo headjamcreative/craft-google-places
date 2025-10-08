@@ -40,7 +40,7 @@ class SyncPlacesData extends AbstractExtension
         return [
             new TwigFunction('syncPlacesData', function(mixed $googlePlacesField) {
               if ($googlePlacesField && ($googlePlacesField['id'] ?? false || $googlePlacesField['lookup'] ?? false)) {
-                $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['id'], $googlePlacesField['lookup']);
+                $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['id'] ?? null, $googlePlacesField['lookup'] ?? null);
               }
 
               $hours = isset($googlePlacesField['hours']) && is_array($googlePlacesField['hours']) ? $googlePlacesField['hours'] : [];
@@ -53,8 +53,8 @@ class SyncPlacesData extends AbstractExtension
                 'phone' => $googlePlacesField['phone'] ?? false ? $googlePlacesField['phone'] : $record->nationalPhoneNumber ?? null,
                 'website' => $googlePlacesField['website'] ?? false ? $googlePlacesField['website'] : $record->websiteUri ?? null,
                 'googleUrl' => $googlePlacesField['googleUrl'] ?? false ? $googlePlacesField['googleUrl'] : $record->googleMapsLinksReviewsUri ?? null,
-                'coordinates' => $googlePlacesField['coordinates'] ?? false ? $googlePlacesField['coordinates'] : ($record->locationLatitude && $record->locationLongitude ? $record->locationLatitude . ',' . $record->locationLongitude : null),
-                'hours' => count($hours) ? $hours : ($record->regularOpeningHours ? json_decode($record->regularOpeningHours, true) : null),
+                'coordinates' => $googlePlacesField['coordinates'] ?? false ? $googlePlacesField['coordinates'] : ($record->locationLatitude ?? false && $record->locationLongitude ?? false ? $record->locationLatitude . ',' . $record->locationLongitude : null),
+                'hours' => count($hours) ? $hours : ($record->regularOpeningHours ?? false ? json_decode($record->regularOpeningHours, true) : []),
                 'hideReviews' => $googlePlacesField['hideReviews'] ?? false,
               ];
             }),
