@@ -43,6 +43,8 @@ class SyncPlacesData extends AbstractExtension
                 $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['id'], $googlePlacesField['lookup']);
               }
 
+              $hours = isset($googlePlacesField['hours']) && is_array($googlePlacesField['hours']) ? $googlePlacesField['hours'] : [];
+
               return [
                 'lookup' => $googlePlacesField['lookup'] ?? null,
                 'id' => $googlePlacesField['id'] ?? null,
@@ -52,7 +54,7 @@ class SyncPlacesData extends AbstractExtension
                 'website' => $googlePlacesField['website'] ?? false ? $googlePlacesField['website'] : $record->websiteUri ?? null,
                 'googleUrl' => $googlePlacesField['googleUrl'] ?? false ? $googlePlacesField['googleUrl'] : $record->googleMapsLinksReviewsUri ?? null,
                 'coordinates' => $googlePlacesField['coordinates'] ?? false ? $googlePlacesField['coordinates'] : ($record->locationLatitude && $record->locationLongitude ? $record->locationLatitude . ',' . $record->locationLongitude : null),
-                'hours' => $googlePlacesField['hours'] ?? false ? $googlePlacesField['hours'] : ($record->regularOpeningHours ? json_decode($record->regularOpeningHours, true) : null),
+                'hours' => count($hours) ? $hours : ($record->regularOpeningHours ? json_decode($record->regularOpeningHours, true) : null),
                 'hideReviews' => $googlePlacesField['hideReviews'] ?? false,
               ];
             }),

@@ -111,6 +111,59 @@
         }}
 
         {{
+          forms.editableTableField({
+            label: 'Google Hours',
+            instructions: 'The business open hours from Google.',
+            id: 'googleHours',
+            name: 'googleHours',
+            cols: {
+              label: {
+                heading: 'Label',
+                handle: 'label',
+                type: 'singleline'
+              },
+              hours: {
+                heading: 'Hours',
+                handle: 'hours',
+                type: 'singleline'
+              }
+            }|filter,
+            rows: recordData.hours|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
+            static: true,
+            maxRows: '7',
+            minRows: '0',
+          })
+        }}
+
+        {%- set hoursVal = value.hours is iterable ? value.hours : [] -%}
+        {{
+          forms.editableTableField({
+            label: 'Override Hours',
+            instructions: 'The business open hours to show instead of the Google-reported hours.',
+            id: 'hours',
+            name: name ~ '[hours]',
+            cols: {
+              label: {
+                heading: 'Label',
+                handle: 'label',
+                type: 'singleline'
+              },
+              hours: {
+                heading: 'Hours',
+                handle: 'hours',
+                type: 'singleline'
+              }
+            }|filter,
+            rows: hoursVal|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
+            maxRows: '7',
+            minRows: '0',
+            allowAdd: true,
+            allowReorder: true,
+            allowDelete: true,
+          })
+        }}
+
+        {{
           forms.lightswitchField({
             label: 'Hide reviews?',
             instructions: 'Optionally hide Google reviews for this directory item',
