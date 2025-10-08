@@ -1,0 +1,13 @@
+{# @var plugin \headjam\craftgoogleplaces\CraftGooglePlaces #}
+{# @var settings \headjam\craftgoogleplaces\models\Settings #}
+
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.textField({
+  label: 'Google Cloud Console API Key',
+  instructions: 'See: https://developers.google.com/places/web-service/get-api-key',
+  id: 'googleApiKey',
+  name: 'googleApiKey',
+  required: true,
+  value: settings['googleApiKey']})
+}}

@@ -1,6 +1,6 @@
 <?php
 /**
- * Google Places Syncs plugin for Craft CMS 3.x
+ * Google Places Syncs plugin for Craft CMS 5.x
  *
  * Syncs Google Places API data to entries.
  *
@@ -10,13 +10,14 @@
 
 namespace headjam\craftgoogleplaces\services;
 
-use headjam\craftgoogleplaces\CraftGooglePlaces;
-
 use Craft;
-use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\base\Field;
+use Exception;
+use yii\base\Component;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
+use headjam\craftgoogleplaces\CraftGooglePlaces;
+use yii\log\Logger;
 
 /**
  * CraftGooglePlacesSync Service
@@ -32,37 +33,37 @@ class CraftGooglePlacesSync extends Component
   // Private Properties
   // =========================================================================
   private $apiDetailsMap = [
-    'name' => [
+    'id' => [
+      'key' => 'id',
+      'format' => 'simple'
+    ],
+    'displayName' => [
       'key' => 'name',
-      'format' => 'simple'
+      'format' => 'nameFormat'
     ],
-    'formatted_address' => [
-      'key' => 'address',
-      'format' => 'simple'
-    ],
-    'formatted_phone_number' => [
+    'nationalPhoneNumber' => [
       'key' => 'phone',
       'format' => 'simple'
     ],
-    'website' => [
-      'key' => 'website',
+    'formattedAddress' => [
+      'key' => 'address',
       'format' => 'simple'
     ],
-    'url' => [
-      'key' => 'googleUrl',
-      'format' => 'simple'
-    ],
-    'opening_hours' => [
-      'key' => 'hours',
-      'format' => 'hoursFormat',
-    ],
-    'geometry' => [
+    'location' => [
       'key' => 'coordinates',
       'format' => 'coordsFormat'
     ],
-    'reviews' => [
-      'key' => 'reviews',
+    'googleMapsLinks' => [
+      'key' => 'googleUrl',
+      'format' => 'googleUrlFormat'
+    ],
+    'websiteUri' => [
+      'key' => 'website',
       'format' => 'simple'
+    ],
+    'regularOpeningHours' => [
+      'key' => 'hours',
+      'format' => 'hoursFormat'
     ]
   ];
 
@@ -70,7 +71,7 @@ class CraftGooglePlacesSync extends Component
 
   // Public Methods
   // =========================================================================
-  /** 
+  /**
    * Determine if a sync is possible, and send it to the id lookup or details query as needed
    * @param ElementInterface $element - The element that was just saved.
    * @param Field $field - The field that triggered this sync.
@@ -81,39 +82,11 @@ class CraftGooglePlacesSync extends Component
     $value = $element->getFieldValue($field->handle);
     $value['updated'] = time();
     if (isset($value['id']) && $value['id'] !== '') {
-      return $this->getPlaceDetails($value, $field, $element);
+      return self::getPlaceDetails($value, $field, $element);
     } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      return $this->getPlaceId($value, $field, $element);
+      return self::getPlaceId($value, $field, $element);
     } else {
       return true;
-    }
-  }
-
-  /** 
-   * Get all entries with the matching field type, update
-   * the updated value of the field to mark it as dirty, then
-   * save the element, triggering the onElementSave function.
-   */
-  public function syncAll()
-  {
-    try {
-      $entries = $this->entriesWithField();
-      foreach($entries as $entry) {
-        $layout = $entry->getFieldLayout();
-        $fields = isset($layout) ? $layout->getFields() : [];
-        foreach ($fields as $field) {
-          if ($field instanceof GooglePlacesSyncField) {
-            $value = $entry->getFieldValue($field->handle);
-            // This marks the field as dirty, triggering the sync on save
-            $value['updated'] = time();
-            $entry->setFieldValue($field->handle, $value);
-            Craft::$app->elements->saveElement($entry);
-          }
-        }
-      }
-      return true;
-    } catch (Exception $e) {
-      return false;
     }
   }
 
@@ -121,40 +94,24 @@ class CraftGooglePlacesSync extends Component
 
   // Private Methods
   // =========================================================================
-  /** 
-   * Return an array of all entries with the custom field type.
-   * @return Entry[]
+  /**
+   * Formats the value for the name.
+   * @param array $name - The name as returned by the Google Places api.
+   * @return string The Craft-ready name.
    */
-  private function entriesWithField() {
-    $allFields = CraftGooglePlaces::getInstance()->fields->getAllFields('global');
-    $searchQuery = '';
-    foreach($allFields as $field) {
-      if ($field instanceof GooglePlacesSyncField) {
-        $searchQuery = ' OR ' . $field->handle . ':*';
-      }
-    }
-    $searchQuery = preg_replace('/ OR /', '', $searchQuery, 1);
-    $entries = strlen($searchQuery) ? \craft\elements\Entry::find()->search($searchQuery)->unique()->all() : [];
-    return $entries;
+  private function nameFormat(array $name)
+  {
+    return $name['text'] ?? '';
   }
 
-  /** 
-   * Formats the value for the hours array.
-   * @param array $hours - The opening hours as returned by the Google Places api.
-   * @param array The Craft-ready array.
+  /**
+   * Formats the Google URL.
+   * @param array $url - The URL as returned by the Google Places api.
+   * @return string The Craft-ready URL.
    */
-  private function hoursFormat(array $hours)
+  private function googleUrlFormat(array $url)
   {
-    if (array_key_exists('weekday_text', $hours) && gettype($hours['weekday_text'] == 'array')) {
-      return array_map(function(string $hourRow) {
-        $dayTime = explode(': ', $hourRow);
-        return [
-          'label' => $dayTime[0],
-          'hours' => $dayTime[1]
-        ];
-      }, $hours['weekday_text']);
-    }
-    return [];
+    return $url['reviewsUri'] ?? '';
   }
 
   /**
@@ -163,13 +120,61 @@ class CraftGooglePlacesSync extends Component
    * @param array The Craft-ready array.
    */
   private function coordsFormat(array $coords) {
-   if (isset($coords['location']) && isset($coords['location']['lat']) && isset($coords['location']['lng'])) {
-    return $coords['location']['lat'] . ',' . $coords['location']['lng'];
-   } 
-   return '';
+    if (isset($coords['latitude']) && isset($coords['longitude'])) {
+      return $coords['latitude'] . ',' . $coords['longitude'];
+    }
+
+    return '';
   }
 
-  /** 
+  /**
+   * Formats the value for the hours array.
+   * @param array $hours - The opening hours as returned by the Google Places api.
+   * @param array The Craft-ready array.
+   */
+  private function hoursFormat(array $hours)
+  {
+    if (array_key_exists('weekdayDescriptions', $hours) && gettype($hours['weekdayDescriptions']) == 'array') {
+      return array_map(function(string $hourRow) {
+        $dayTime = explode(': ', $hourRow);
+        return [
+          'label' => $dayTime[0],
+          'hours' => $dayTime[1]
+        ];
+      }, $hours['weekdayDescriptions']);
+    }
+    return [];
+  }
+
+  /**
+   * Set the place details on the element.
+   * @param array $data - The place data from the API.
+   * @param Field $field - The field to set the data on.
+   * @param ElementInterface $element - The element to set the data on.
+   * @return bool
+   */
+  private function setPlaceDetails(array $data, Field $field, ElementInterface $element): bool
+  {
+    $data = array_filter($data, function($key) {
+      return array_key_exists($key, $this->apiDetailsMap);
+    }, ARRAY_FILTER_USE_KEY);
+
+    foreach ($data as $key => $val) {
+      $format = $this->apiDetailsMap[$key]['format'];
+      if ($format == 'simple') {
+        $value[$this->apiDetailsMap[$key]['key']] = $val;
+      } else {
+        $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
+      }
+    }
+    $value["updated"] = date('Y-m-d H:i:s');
+
+    $element->setFieldValue($field->handle, $value);
+
+    return true;
+  }
+
+  /**
    * Query the details for a given GooglePlace and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
    * @param array $value - The existing value for the field.
@@ -181,32 +186,20 @@ class CraftGooglePlacesSync extends Component
   {
     try {
       $id = $value['id'];
-      // Just being extra-safe with another check
       if (isset($id) && $id !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
-        if (isset($result['success']) && isset($result['data']) && isset($result['data']['result'])) {
-          $data = array_filter($result['data']['result'], function($key) {
-            return array_key_exists($key, $this->apiDetailsMap);
-          }, ARRAY_FILTER_USE_KEY);
-          foreach ($data as $key => $val) {
-            $format = $this->apiDetailsMap[$key]['format'];
-            if ($format == 'simple') {
-              $value[$this->apiDetailsMap[$key]['key']] = $val;
-            } else {
-              $value[$this->apiDetailsMap[$key]['key']] = $this->$format($val);
-            }
-          }
-          $element->setFieldValue($field->handle, $value);
+        if (isset($result['success']) && isset($result['data'])) {
+          return self::setPlaceDetails($result['data'], $field, $element);
         }
       }
+
       return true;
     } catch (Exception $error) {
-      // We'll continue to save anyway
       return true;
     }
   }
 
-  /** 
+  /**
    * Lookup a GooglePlaces place id for a given query and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
    * @param array $value - The existing value for the field.
@@ -214,7 +207,7 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element the field belongs to.
    * @return bool Returns true.
    */
-  private function getPlaceId(array $value, Field $field, ElementInterface $element) 
+  private function getPlaceId(array $value, Field $field, ElementInterface $element)
   {
     try {
       $lookup = $value['lookup'];
@@ -222,19 +215,15 @@ class CraftGooglePlacesSync extends Component
       if (isset($lookup) && $lookup !== '') {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeSearch($lookup);
         if (
-          $result['success'] && 
-          $result['data']['candidates'] && 
-          $result['data']['candidates'][0] && 
-          $result['data']['candidates'][0]['place_id']
+          $result['success'] &&
+          $result['data']['places'][0]['id'] ?? false
         ) {
-          $value['id'] = $result['data']['candidates'][0]['place_id'];
-          $element->setFieldValue($field->handle, $value);
-          return $this->getPlaceDetails($value, $field, $element);
+          return self::setPlaceDetails($result['data']['places'][0], $field, $element);
         }
       }
+
       return true;
     } catch (Exception $error) {
-      // We'll continue to save anyway
       return true;
     }
   }
