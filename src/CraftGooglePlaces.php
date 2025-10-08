@@ -22,6 +22,8 @@ use headjam\craftgoogleplaces\models\Settings;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesApi;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesPersist;
 use headjam\craftgoogleplaces\services\CraftGooglePlacesSync;
+use headjam\craftgoogleplaces\web\twig\GooglePlaceTwigExtension;
+use headjam\craftgoogleplaces\web\twig\GoolePlaceTwigExtension;
 use headjam\craftgoogleplaces\web\twig\SyncPlacesData;
 use yii\base\Event;
 use yii\log\Logger;

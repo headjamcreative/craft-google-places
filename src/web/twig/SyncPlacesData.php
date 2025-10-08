@@ -5,6 +5,7 @@ namespace headjam\craftgoogleplaces\web\twig;
 use Craft;
 use craft\base\ElementInterface;
 use craft\base\Field;
+use headjam\craftgoogleplaces\CraftGooglePlaces;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
@@ -37,8 +38,23 @@ class SyncPlacesData extends AbstractExtension
         // Define custom Twig functions
         // (see https://twig.symfony.com/doc/3.x/advanced.html#functions)
         return [
-            new TwigFunction('syncPlacesData', function(mixed $entry) {
-              Craft::$app->elements->saveElement($entry);
+            new TwigFunction('syncPlacesData', function(mixed $googlePlacesField) {
+              if ($googlePlacesField && ($googlePlacesField['id'] ?? false || $googlePlacesField['lookup'] ?? false)) {
+                $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['id'], $googlePlacesField['lookup']);
+              }
+
+              return [
+                'lookup' => $googlePlacesField['lookup'] ?? null,
+                'id' => $googlePlacesField['id'] ?? null,
+                'name' => $googlePlacesField['name'] ?? $record->displayName ?? null,
+                'address' => $googlePlacesField['address'] ?? false ? $googlePlacesField['address'] : $record->formattedAddress ?? null,
+                'phone' => $googlePlacesField['phone'] ?? false ? $googlePlacesField['phone'] : $record->nationalPhoneNumber ?? null,
+                'website' => $googlePlacesField['website'] ?? false ? $googlePlacesField['website'] : $record->websiteUri ?? null,
+                'googleUrl' => $googlePlacesField['googleUrl'] ?? false ? $googlePlacesField['googleUrl'] : $record->googleMapsLinksReviewsUri ?? null,
+                'coordinates' => $googlePlacesField['coordinates'] ?? false ? $googlePlacesField['coordinates'] : ($record->locationLatitude && $record->locationLongitude ? $record->locationLatitude . ',' . $record->locationLongitude : null),
+                'hours' => $googlePlacesField['hours'] ?? false ? $googlePlacesField['hours'] : ($record->regularOpeningHours ? json_decode($record->regularOpeningHours, true) : null),
+                'hideReviews' => $googlePlacesField['hideReviews'] ?? false,
+              ];
             }),
         ];
     }

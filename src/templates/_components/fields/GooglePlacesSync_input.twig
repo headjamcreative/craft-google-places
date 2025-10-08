@@ -14,6 +14,10 @@
 #}
 
 {%- set dataSyncing = value.id ?? false or value.lookup ?? false -%}
+{%- set recordData = syncPlacesData({
+  id: value.id,
+  lookup: value.lookup
+}) -%}
 
 {% import "_includes/forms" as forms %}
 <div class="matrix matrix-field">
@@ -46,7 +50,7 @@
             instructions: 'The name of the business.',
             id: 'name',
             name: name ~ '[name]',
-            placeholder: 'Test',
+            placeholder: recordData.name ?? '',
             value: value.name ?? ''
           })
         }}
@@ -57,7 +61,7 @@
             instructions: 'The physical address of the business, with commas creating new lines when rendered.',
             id: 'address',
             name: name ~ '[address]',
-            placeholder: 'Test',
+            placeholder: recordData.address ?? '',
             value: value.address ?? ''
           })
         }}
@@ -68,7 +72,7 @@
             instructions: 'The phone number of the business.',
             id: 'phone',
             name: name ~ '[phone]',
-            placeholder: 'Test',
+            placeholder: recordData.phone ?? '',
             value: value.phone ?? ''
           })
         }}
@@ -79,7 +83,7 @@
             instructions: 'The website of the business.',
             id: 'website',
             name: name ~ '[website]',
-            placeholder: 'Test',
+            placeholder: recordData.website ?? '',
             value: value.website ?? ''
           })
         }}
@@ -90,7 +94,7 @@
             instructions: 'The Google url for maps and reviews.',
             id: 'googleUrl',
             name: name ~ '[googleUrl]',
-            placeholder: 'Test',
+            placeholder: recordData.googleUrl ?? '',
             value: value.googleUrl ?? ''
           })
         }}
@@ -101,34 +105,8 @@
             instructions: 'If alternate coordinates are supplied below, this will be ignored..',
             id: 'coordinates',
             name: name ~ '[coordinates]',
-            placeholder: 'Test',
+            placeholder: recordData.coordinates ?? '',
             value: value.coordinates ?? ''
-          })
-        }}
-
-        {%- set weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] -%}
-        {% set hoursVal = (value.hours ?? false) is iterable ? value.hours : weekdays|map(day => {label: day, hours: ''}) %}
-        {{
-          forms.editableTableField({
-            label: 'Hours',
-            instructions: 'The business open hours.',
-            id: 'hours',
-            name: name ~ '[hours]',
-            cols: {
-              label: {
-                heading: 'Label',
-                handle: 'label',
-                type: 'singleline'
-              },
-              hours: {
-                heading: 'Hours',
-                handle: 'hours',
-                type: 'singleline'
-              }
-            }|filter,
-            rows: hoursVal|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
-            maxRows: '7',
-            minRows: '0'
           })
         }}
 

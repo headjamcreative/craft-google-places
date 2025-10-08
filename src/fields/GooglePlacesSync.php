@@ -46,7 +46,8 @@ class GooglePlacesSync extends Field
         !$element->getIsRevision() &&
         !$element->getIsDraft()
       ) {
-        return CraftGooglePlaces::getInstance()->googlePlacesSync->sync($element, $this, true);
+        $value = $element->getFieldValue($this->handle);
+        CraftGooglePlaces::getInstance()->googlePlacesSync->sync($value['id'], $value['lookup']);
       }
 
       return true;

@@ -37,12 +37,12 @@ class CraftGooglePlacesPersist extends Component {
    * @param GooglePlaceModel $model
    * @return bool
    */
-  public function saveGooglePlaceData(GooglePlaceModel $model) : bool
+  public function saveGooglePlaceData(GooglePlaceModel $model) : ?GooglePlaceRecord
   {
       try {
         if (!$model->validate()) {
             Craft::error('Google Place model did not validate: ' . $model->displayName . ' - ' . json_encode($model->getErrors()), 'craft-google-places');
-            return false;
+            return null;
         }
 
         $record = GooglePlaceRecord::findOne(['placeId' => $model->placeId]);
@@ -61,10 +61,23 @@ class CraftGooglePlacesPersist extends Component {
         $record->regularOpeningHours = $model->regularOpeningHours;
         $record->updated = $model->updated ?? date('Y-m-d H:i:s');
 
-        return $record->save();
+        $success = $record->save();
+
+        return $success ? $record : null;
       } catch (Exception $e) {
           Craft::error('Google Place model did not persist: ' . $model->displayName . ' - ' . $e->getMessage(), 'craft-google-places');
-          return false;
+          return null;
       }
+  }
+
+  public function findGooglePlaceData(string $placeId, string $lookup) : ?GooglePlaceRecord
+  {
+      $record = GooglePlaceRecord::findOne(['placeId' => $placeId]);
+      $yesterday = date('Y-m-d', strtotime('-1 day'));
+      if ($record == null || $record->updated == null || $yesterday > $record->updated) {
+        return CraftGooglePlaces::getInstance()->googlePlacesSync->sync($placeId, $lookup);
+      }
+
+      return $record;
   }
 }

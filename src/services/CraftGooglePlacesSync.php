@@ -18,6 +18,7 @@ use yii\base\Component;
 use headjam\craftgoogleplaces\fields\GooglePlacesSync as GooglePlacesSyncField;
 use headjam\craftgoogleplaces\CraftGooglePlaces;
 use headjam\craftgoogleplaces\models\GooglePlaceModel;
+use headjam\craftgoogleplaces\records\GooglePlaceRecord;
 
 /**
  * CraftGooglePlacesSync Service
@@ -53,13 +54,12 @@ class CraftGooglePlacesSync extends Component
    * @param Field $field - The field that triggered this sync.
    * @return bool Returns true to ensure element saves.
    */
-  public function sync(ElementInterface $element, Field $field)
+  public function sync(string $placeId, string $lookup)
   {
-    $value = $element->getFieldValue($field->handle);
-    if (isset($value['id']) && $value['id'] !== '') {
-      return self::getPlaceDetails($value);
-    } else if (isset($value['lookup']) && $value['lookup'] !== '') {
-      return self::getPlaceId($value);
+    if ($placeId) {
+      return self::getPlaceDetails($placeId);
+    } else if ($lookup) {
+      return self::getPlaceId($lookup);
     } else {
       return true;
     }
@@ -95,7 +95,7 @@ class CraftGooglePlacesSync extends Component
    * @param ElementInterface $element - The element to set the data on.
    * @return bool
    */
-  private function setPlaceDetails(array $data): bool
+  private function setPlaceDetails(array $data): ?GooglePlaceRecord
   {
     try {
         $data = array_filter($data, function($key) {
@@ -113,29 +113,24 @@ class CraftGooglePlacesSync extends Component
         $model->websiteUri = $data['websiteUri'] ?? null;
         $model->regularOpeningHours = $data['regularOpeningHours'] ?? null ? self::hoursFormat($data['regularOpeningHours'] ?? null) : null;
 
-        CraftGooglePlaces::getInstance()->googlePlacesPersist->saveGooglePlaceData($model);
-
-        return true;
+        return CraftGooglePlaces::getInstance()->googlePlacesPersist->saveGooglePlaceData($model);
     } catch (Exception $error) {
         Craft::error('Error setting place details: ' . $data['displayName']['text'] . ' - ' . $error->getMessage(), 'craft-google-places');
-        return false;
+        return null;
     }
   }
 
   /**
    * Query the details for a given GooglePlace and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
-   * @param array $value - The existing value for the field.
-   * @param Field $field - The field that triggered this action.
-   * @param ElementInterface $element - The element the field belongs to.
+   * @param string $placeId - The place ID to lookup.
    * @return bool Returns true.
    */
-  private function getPlaceDetails(array $value)
+  private function getPlaceDetails(string $placeId)
   {
     try {
-      $id = $value['id'];
-      if (isset($id) && $id !== '') {
-        $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($id);
+      if ($placeId) {
+        $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeDetails($placeId);
         if (isset($result['success']) && isset($result['data'])) {
           return self::setPlaceDetails($result['data']);
         }
@@ -151,17 +146,14 @@ class CraftGooglePlacesSync extends Component
   /**
    * Lookup a GooglePlaces place id for a given query and save it against the value.
    * Returns true regardless of outcome so the entry saves successfully.
-   * @param array $value - The existing value for the field.
-   * @param Field $field - The field that triggered this action.
-   * @param ElementInterface $element - The element the field belongs to.
+   * @param string $lookup - The text to lookup in Google Places API.
    * @return bool Returns true.
    */
-  private function getPlaceId(array $value)
+  private function getPlaceId(string $lookup)
   {
     try {
-      $lookup = $value['lookup'];
       // Just being extra-safe with another check
-      if (isset($lookup) && $lookup !== '') {
+      if ($lookup) {
         $result = CraftGooglePlaces::getInstance()->googlePlacesApi->placeSearch($lookup);
         if (
           $result['success'] &&
