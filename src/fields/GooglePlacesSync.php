@@ -47,11 +47,14 @@ class GooglePlacesSync extends Field
         !$element->getIsDraft()
       ) {
         $value = $element->getFieldValue($this->handle);
-        $placeId = isset($value['placeId']) ? $value['placeId'] : null;
+        $placeId = isset($value['id']) ? $value['id'] : null;
         $lookup = isset($value['lookup']) ? $value['lookup'] : null;
         $result = CraftGooglePlaces::getInstance()->googlePlacesSync->sync($placeId, $lookup);
-        if ($result->placeId ?? false && !($value['placeId'] ?? false)) {
-          $value['placeId'] = $result->placeId;
+        $canUpdatePlaceId = $result->placeId ?? false && !($value['id'] ?? false);
+        $canRemoveLookup = $result->placeId ?? false || $value['lookup'] ?? false;
+        if ($canUpdatePlaceId || $canRemoveLookup) {
+          $value['id'] = $canUpdatePlaceId ? $result->placeId : $value['id'];
+          $value['lookup'] = $canRemoveLookup ? null : $value['lookup'];
           $element->setFieldValue($this->handle, $value);
         }
       }

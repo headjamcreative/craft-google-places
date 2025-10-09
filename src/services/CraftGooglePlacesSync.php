@@ -61,7 +61,7 @@ class CraftGooglePlacesSync extends Component
     } else if ($lookup) {
       return self::getPlaceId($lookup);
     } else {
-      return true;
+      return null;
     }
   }
 
@@ -101,6 +101,7 @@ class CraftGooglePlacesSync extends Component
         $data = array_filter($data, function($key) {
           return in_array($key, $this->apiDetailsMap);
         }, ARRAY_FILTER_USE_KEY);
+
         $model = new GooglePlaceModel();
         $model->placeId = $data['id'];
         $model->displayName = $data['displayName']['text'];
@@ -135,10 +136,10 @@ class CraftGooglePlacesSync extends Component
         }
       }
 
-      return true;
+      return null;
     } catch (Exception $error) {
       Craft::error('Error getting place details: ' . $error->getMessage(), 'craft-google-places');
-      return true;
+      return null;
     }
   }
 
@@ -162,9 +163,9 @@ class CraftGooglePlacesSync extends Component
         }
       }
 
-      return true;
+      return null;
     } catch (Exception $error) {
-      return true;
+      return null;
     }
   }
 }

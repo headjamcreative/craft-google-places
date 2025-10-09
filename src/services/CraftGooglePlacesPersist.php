@@ -70,7 +70,7 @@ class CraftGooglePlacesPersist extends Component {
       }
   }
 
-  public function findGooglePlaceData(?string $placeId, ?string $lookup) : ?GooglePlaceRecord
+  public function findGooglePlaceData(?string $placeId = null, ?string $lookup = null) : ?GooglePlaceRecord
   {
       $record = $placeId ?? null ? GooglePlaceRecord::findOne(['placeId' => $placeId]) : null;
       $yesterday = date('Y-m-d', strtotime('-0 day'));
