@@ -56,9 +56,9 @@ class CraftGooglePlacesSync extends Component
    */
   public function sync(?string $placeId = null, ?string $lookup = null)
   {
-    if ($placeId !== null) {
+    if ($placeId) {
       return self::getPlaceDetails($placeId);
-    } else if ($lookup !== null) {
+    } else if ($lookup) {
       return self::getPlaceId($lookup);
     } else {
       return true;
@@ -101,7 +101,6 @@ class CraftGooglePlacesSync extends Component
         $data = array_filter($data, function($key) {
           return in_array($key, $this->apiDetailsMap);
         }, ARRAY_FILTER_USE_KEY);
-
         $model = new GooglePlaceModel();
         $model->placeId = $data['id'];
         $model->displayName = $data['displayName']['text'];

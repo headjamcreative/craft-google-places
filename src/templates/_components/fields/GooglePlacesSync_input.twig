@@ -13,11 +13,11 @@
  */
 #}
 
-{%- set dataSyncing = value.id ?? false or value.lookup ?? false -%}
-{%- set recordData = syncPlacesData({
-  id: value.id,
+{%- set dataSyncing = value.id is defined or value.lookup is defined -%}
+{%- set recordData = dataSyncing ? syncPlacesData({
+  id: value.id ?? null,
   lookup: value.lookup ?? null
-}) -%}
+}) : null -%}
 
 {% import "_includes/forms" as forms %}
 <div class="matrix matrix-field">
@@ -38,9 +38,9 @@
           forms.textField({
             label: 'Google Places ID',
             instructions: 'The ID to query Google Places for data. If blank, the system will try to retrieve an ID based on the Google Lookup value above.',
-            id: 'id',
-            name: name ~ '[id]',
-            value: value.id ?? ''
+            id: 'placeId',
+            name: name ~ '[placeId]',
+            value: value.placeId ?? ''
           })
         }}
 
@@ -128,7 +128,7 @@
                 type: 'singleline'
               }
             }|filter,
-            rows: recordData.hours|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
+            rows: (recordData.hours ?? [])|map(hour => {label: hour.label ?? '', hours: hour.hours ?? '' }),
             static: true,
             maxRows: '7',
             minRows: '0',

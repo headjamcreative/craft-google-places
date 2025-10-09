@@ -39,15 +39,15 @@ class SyncPlacesData extends AbstractExtension
         // (see https://twig.symfony.com/doc/3.x/advanced.html#functions)
         return [
             new TwigFunction('syncPlacesData', function(mixed $googlePlacesField) {
-              if ($googlePlacesField && ($googlePlacesField['id'] ?? false || $googlePlacesField['lookup'] ?? false)) {
-                $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['id'] ?? null, $googlePlacesField['lookup'] ?? null);
+              if ($googlePlacesField && ($googlePlacesField['placeId'] ?? false || $googlePlacesField['lookup'] ?? false)) {
+                $record = CraftGooglePlaces::getInstance()->googlePlacesPersist->findGooglePlaceData($googlePlacesField['placeId'] ?? null, $googlePlacesField['lookup'] ?? null);
               }
 
               $hours = isset($googlePlacesField['hours']) && is_array($googlePlacesField['hours']) ? $googlePlacesField['hours'] : [];
 
               return [
                 'lookup' => $googlePlacesField['lookup'] ?? null,
-                'id' => $googlePlacesField['id'] ?? null,
+                'placeId' => $googlePlacesField['placeId'] ?? null,
                 'name' => $googlePlacesField['name'] ?? $record->displayName ?? null,
                 'address' => $googlePlacesField['address'] ?? false ? $googlePlacesField['address'] : $record->formattedAddress ?? null,
                 'phone' => $googlePlacesField['phone'] ?? false ? $googlePlacesField['phone'] : $record->nationalPhoneNumber ?? null,
